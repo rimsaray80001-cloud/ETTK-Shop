@@ -5,45 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់ - Full Dashboard</title>
+    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់ - Full Dashboard Fix</title>
     <style>
         :root { 
             --primary: #219E42; --danger: #e74c3c; --warning: #f39c12; 
             --bg: #f4f7f6; --unit: #1a73e8; --curr: #e67e22; 
             --white: #ffffff; --dark: #2c3e50;
         }
-        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; display: flex; background: var(--bg); min-height: 100vh; color: #333; }
-        .sidebar { width: 260px; background: var(--primary); height: 100vh; position: fixed; padding: 40px 15px; box-sizing: border-box; color: white; z-index: 100; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
-        .sidebar h2 { font-size: 19px; margin-bottom: 30px; font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
-        .nav-btn { width: 100%; padding: 14px 15px; margin-bottom: 10px; border: none; background: transparent; border-radius: 12px; cursor: pointer; text-align: left; font-family: inherit; font-size: 15px; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 12px; transition: 0.3s; }
+        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; display: flex; background: var(--bg); min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--primary); height: 100vh; position: fixed; padding: 40px 15px; box-sizing: border-box; color: white; z-index: 100; }
+        .sidebar h2 { font-size: 19px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+        .nav-btn { width: 100%; padding: 14px 15px; margin-bottom: 10px; border: none; background: transparent; border-radius: 12px; cursor: pointer; text-align: left; font-family: inherit; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 12px; }
         .nav-btn.active { background: var(--white); color: var(--primary); font-weight: 700; }
         .main { margin-left: 260px; padding: 30px; width: calc(100% - 260px); box-sizing: border-box; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 20px; }
+        
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .filter-group { display: flex; background: #e2e8f0; padding: 5px; border-radius: 15px; gap: 5px; }
-        .filter-btn { border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: #64748b; transition: 0.3s; }
+        .filter-btn { border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: #64748b; }
         .filter-btn.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 35px; }
-        .stat-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-bottom: 5px solid #eee; transition: 0.3s; }
+        .stat-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-bottom: 5px solid #eee; }
         .stat-card h4 { margin: 0; font-size: 14px; color: #7f8c8d; display: flex; align-items: center; gap: 8px; }
         .stat-card .val { font-size: 24px; font-weight: 700; margin: 12px 0; display: block; color: var(--dark); }
-        .stat-card .diff { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .stat-card .diff { font-size: 13px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
         .up { color: var(--primary); }
         .down { color: var(--danger); }
+
         .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
         .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 13px; margin-bottom: 8px; font-weight: 600; }
         input { padding: 12px 15px; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; outline: none; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 14px 40px; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-left: auto; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 14px 40px; border-radius: 12px; cursor: pointer; font-weight: 700; margin-left: auto; display: block; }
+        
         .table-container { overflow-x: auto; border-radius: 15px; background: white; border: 1px solid #edf2f7; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { background: #f8fafc; padding: 18px 15px; text-align: left; font-size: 13px; color: #64748b; }
         td { padding: 16px 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         .action-btns { display: flex; gap: 10px; }
-        .icon-btn { width: 36px; height: 36px; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .icon-btn { width: 34px; height: 34px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .edit-btn { background: #fff9db; color: #f59f00; }
         .del-btn { background: #fff5f5; color: #fa5252; }
-        #status { position: fixed; top: 25px; right: 25px; padding: 18px 30px; border-radius: 15px; color: white; font-weight: 600; z-index: 1001; display: none; }
+        
+        #status { position: fixed; top: 25px; right: 25px; padding: 15px 25px; border-radius: 10px; color: white; z-index: 1001; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .hidden { display: none; }
     </style>
 </head>
@@ -59,7 +64,7 @@
     <div id="status"></div>
     <div class="dashboard-header">
         <div>
-            <h1><i class="fa-solid fa-gauge-high"></i> Dashboard វិភាគការលក់</h1>
+            <h1><i class="fa-solid fa-gauge-high"></i> Dashboard វិភាគ</h1>
             <small id="rangeLabel" style="color: var(--primary); font-weight: 600;"></small>
         </div>
         <div class="filter-group">
@@ -73,31 +78,29 @@
 
     <div id="salesTab">
         <div class="card">
-            <h3 id="formTitleSales" style="color:var(--primary)"><i class="fa-solid fa-cart-plus"></i> បញ្ចូលការលក់</h3>
+            <h3 id="formTitleSales" style="margin-top:0; color:var(--primary)">បញ្ចូលការលក់</h3>
             <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="sDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="sAgent"></div>
-                <div class="field"><label style="color:var(--unit)">Ads/Gross</label><input type="number" id="uAds" value="0"></div>
-                <div class="field"><label style="color:var(--unit)">Change SIM</label><input type="number" id="uSim" value="0"></div>
+                <div class="field"><label>Ads/Gross</label><input type="number" id="uAds" value="0"></div>
+                <div class="field"><label>Change SIM</label><input type="number" id="uSim" value="0"></div>
             </div>
             <div class="compact-grid">
-                <div class="field"><label style="color:var(--unit)">Home</label><input type="number" id="uHome" value="0"></div>
-                <div class="field"><label style="color:var(--unit)">Fiber</label><input type="number" id="uFiber" value="0"></div>
-                <div class="field"><label style="color:var(--curr)">Top Up ($)</label><input type="number" id="rTopup" value="0"></div>
-                <div class="field"><label style="color:var(--curr)">SC Shop ($)</label><input type="number" id="rShop" value="0"></div>
+                <div class="field"><label>Home</label><input type="number" id="uHome" value="0"></div>
+                <div class="field"><label>Fiber</label><input type="number" id="uFiber" value="0"></div>
+                <div class="field"><label>Top Up ($)</label><input type="number" id="rTopup" value="0"></div>
+                <div class="field"><label>SC Shop ($)</label><input type="number" id="rShop" value="0"></div>
             </div>
             <div class="compact-grid">
-                <div class="field"><label style="color:var(--curr)">SC Dealer ($)</label><input type="number" id="rDealer" value="0"></div>
-                <div class="field"><label style="color:var(--primary)">សរុបការលក់ ($)</label><input type="number" id="rTotal" value="0" style="background:#f0fdf4; font-weight:700;"></div>
+                <div class="field"><label>SC Dealer ($)</label><input type="number" id="rDealer" value="0"></div>
+                <div class="field"><label style="color:var(--primary)">សរុបការលក់ ($)</label><input type="number" id="rTotal" value="0" style="background:#f0fdf4;"></div>
                 <div class="field"></div><div class="field"></div>
             </div>
             <button class="btn-save" onclick="save('Sales')">រក្សាទុក</button>
         </div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>Unit (A/S/H/F)</th><th>Curr (T/S/D)</th><th>សរុប $</th><th>Action</th></tr>
-                </thead>
+                <thead><tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>Unit</th><th>Curr</th><th>សរុប $</th><th>Action</th></tr></thead>
                 <tbody id="salBody"></tbody>
             </table>
         </div>
@@ -105,7 +108,7 @@
 
     <div id="depositTab" class="hidden">
         <div class="card">
-            <h3 id="formTitleDep" style="color:var(--primary)"><i class="fa-solid fa-wallet"></i> បញ្ចូលការដាក់ប្រាក់</h3>
+            <h3 style="margin-top:0; color:var(--primary)">បញ្ចូលការដាក់ប្រាក់</h3>
             <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="dDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="dAgent"></div>
@@ -127,12 +130,12 @@
     const API = "https://script.google.com/macros/s/AKfycbx1B-HwEH2XmsC-8L4U72sE6w7tOWfCw86l8-tzDh023O0ImMU5BoeN-J07Ag6-8pT0/exec";
     let state = { store: [], range: 'MOM', isEdit: false, editIdx: null };
 
+    // --- Tab & Range Control ---
     function showTab(t, b) {
         document.getElementById('depositTab').classList.toggle('hidden', t !== 'deposit');
         document.getElementById('salesTab').classList.toggle('hidden', t !== 'sales');
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         b.classList.add('active');
-        resetForm();
     }
 
     function setRange(r, b) {
@@ -142,45 +145,54 @@
         updateDashboard();
     }
 
+    // --- Data Management ---
     async function load() {
-        showMsg("⏳ ទាញទិន្នន័យ...", "var(--unit)");
+        showMsg("⏳ កំពុងទាញទិន្នន័យ...", "var(--unit)");
         try {
             const res = await fetch(API);
             state.store = await res.json();
             render();
             updateDashboard();
             document.getElementById('status').style.display = 'none';
-        } catch(e) { showMsg("❌ Error!", "var(--danger)"); }
+        } catch(e) { showMsg("❌ Error Connecting!", "var(--danger)"); }
     }
 
+    // --- LOGIC គណនា DASHBOARD (FIXED) ---
     function updateDashboard() {
         const now = new Date();
-        const todayDay = now.getDate();
-        let cur = {tot:0, gro:0, top:0, sim:0}, pre = {tot:0, gro:0, top:0, sim:0};
-        
-        if(state.range === 'MOM') {
-            const thisM = now.getMonth() + 1, thisY = now.getFullYear();
-            const lastM = thisM === 1 ? 12 : thisM - 1, lastY = thisM === 1 ? thisY - 1 : thisY;
-            
-            cur = calcM(thisM, thisY, 1, 31);
-            pre = calcM(lastM, lastY, 1, todayDay); // ធៀបនឹងថ្ងៃដូចគ្នានៃខែមុន
-            document.getElementById('rangeLabel').innerText = `ធៀបនឹងថ្ងៃទី ១ ដល់ ${todayDay} ខែមុន`;
+        const tDay = now.getDate();
+        const tMonth = now.getMonth() + 1;
+        const tYear = now.getFullYear();
+
+        let cur = { tot: 0, gro: 0, top: 0, sim: 0 };
+        let pre = { tot: 0, gro: 0, top: 0, sim: 0 };
+        let label = "";
+
+        if (state.range === 'MOM') {
+            const lastM = tMonth === 1 ? 12 : tMonth - 1;
+            const lastY = tMonth === 1 ? tYear - 1 : tYear;
+
+            cur = sumData(tMonth, tYear, 1, 31); // ខែនេះទាំងអស់
+            pre = sumData(lastM, lastY, 1, tDay); // ខែមុន ត្រឹមថ្ងៃដូចគ្នា
+            label = `ធៀបនឹងថ្ងៃទី ១ ដល់ ${tDay} ខែមុន`;
         } else {
             const days = parseInt(state.range);
-            const d1_end = new Date(); const d1_start = new Date(); d1_start.setDate(d1_end.getDate() - days + 1);
-            const d2_end = new Date(); d2_end.setDate(d1_start.getDate() - 1);
-            const d2_start = new Date(); d2_start.setDate(d2_end.getDate() - days + 1);
+            const d1_s = new Date(); d1_s.setDate(now.getDate() - days + 1);
+            const d2_e = new Date(); d2_e.setDate(d1_s.getDate() - 1);
+            const d2_s = new Date(); d2_s.setDate(d2_e.getDate() - days + 1);
 
-            cur = calcR(d1_start, d1_end);
-            pre = calcR(d2_start, d2_end);
-            document.getElementById('rangeLabel').innerText = `${days} ថ្ងៃចុងក្រោយ ធៀបនឹង ${days} ថ្ងៃមុននោះ`;
+            cur = sumByRange(d1_s, now);
+            pre = sumByRange(d2_s, d2_e);
+            label = `${days} ថ្ងៃចុងក្រោយ ធៀបនឹង ${days} ថ្ងៃមុន`;
         }
 
-        function calcM(m, y, sd, ed) {
-            let r = {tot:0, gro:0, top:0, sim:0};
+        // មុខងារបូកតាម ខែ/ឆ្នាំ
+        function sumData(m, y, sd, ed) {
+            let r = { tot: 0, gro: 0, top: 0, sim: 0 };
             state.store.filter(i => i.recordType === 'Sales').forEach(i => {
-                const [iy, im, id] = i.date.split('-').map(Number);
-                if(im === m && iy === y && id >= sd && id <= ed) {
+                const parts = i.date.split('-'); // ["2024", "03", "20"]
+                const iy = parseInt(parts[0]), im = parseInt(parts[1]), id = parseInt(parts[2]);
+                if (im === m && iy === y && id >= sd && id <= ed) {
                     r.tot += parseFloat(i.totalRev || 0); r.gro += parseFloat(i.gross || 0);
                     r.top += parseFloat(i.topup || 0); r.sim += parseFloat(i.sim || 0);
                 }
@@ -188,11 +200,12 @@
             return r;
         }
 
-        function calcR(s, e) {
-            let r = {tot:0, gro:0, top:0, sim:0};
+        // មុខងារបូកតាមចន្លោះថ្ងៃ
+        function sumByRange(start, end) {
+            let r = { tot: 0, gro: 0, top: 0, sim: 0 };
             state.store.filter(i => i.recordType === 'Sales').forEach(i => {
                 const d = new Date(i.date);
-                if(d >= s && d <= e) {
+                if (d >= start && d <= end) {
                     r.tot += parseFloat(i.totalRev || 0); r.gro += parseFloat(i.gross || 0);
                     r.top += parseFloat(i.topup || 0); r.sim += parseFloat(i.sim || 0);
                 }
@@ -200,28 +213,31 @@
             return r;
         }
 
-        const build = (title, icon, cv, pv, isC, col) => {
+        const buildCard = (title, icon, cv, pv, isC, col) => {
             const diff = cv - pv;
             const per = pv > 0 ? ((diff / pv) * 100).toFixed(0) : (cv > 0 ? 100 : 0);
+            const isUp = diff >= 0;
             return `
                 <div class="stat-card" style="border-bottom-color:${col}">
                     <h4><i class="${icon}"></i> ${title}</h4>
                     <span class="val">${isC?'$':''}${cv.toLocaleString()}</span>
-                    <div class="diff ${diff>=0?'up':'down'}">
-                        <i class="fa-solid fa-arrow-${diff>=0?'up':'down'}"></i> 
-                        <b>${diff>=0?'+':''}${per}%</b>
+                    <div class="diff ${isUp?'up':'down'}">
+                        <i class="fa-solid fa-arrow-${isUp?'up':'down'}"></i> 
+                        <b>${isUp?'+':''}${per}%</b>
                         <small style="color:#999; font-weight:400"> (មុន: ${pv.toLocaleString()})</small>
                     </div>
                 </div>`;
         };
 
+        document.getElementById('rangeLabel').innerText = label;
         document.getElementById('dashboardStats').innerHTML = 
-            build("ចំណូលសរុប", "fa-solid fa-money-bill-wave", cur.tot, pre.tot, true, "var(--primary)") +
-            build("Gross សរុប", "fa-solid fa-tower-broadcast", cur.gro, pre.gro, false, "var(--warning)") +
-            build("Top Up", "fa-solid fa-mobile-screen", cur.top, pre.top, true, "var(--curr)") +
-            build("Change SIM", "fa-solid fa-sim-card", cur.sim, pre.sim, false, "var(--unit)");
+            buildCard("ចំណូលសរុប", "fa-solid fa-money-bill-wave", cur.tot, pre.tot, true, "var(--primary)") +
+            buildCard("Gross សរុប", "fa-solid fa-tower-broadcast", cur.gro, pre.gro, false, "var(--warning)") +
+            buildCard("Top Up", "fa-solid fa-mobile-screen", cur.top, pre.top, true, "var(--curr)") +
+            buildCard("Change SIM", "fa-solid fa-sim-card", cur.sim, pre.sim, false, "var(--unit)");
     }
 
+    // --- Rendering & UI Helpers ---
     function render() {
         const dBody = document.getElementById('depBody'), sBody = document.getElementById('salBody');
         dBody.innerHTML = sBody.innerHTML = "";
@@ -256,18 +272,21 @@
 
     async function save(type) {
         const obj = { recordType: type, action: state.isEdit ? "UPDATE" : "ADD", rowIndex: state.editIdx, date: document.getElementById(type === 'Deposit' ? 'dDate' : 'sDate').value, agent: document.getElementById(type === 'Deposit' ? 'dAgent' : 'sAgent').value };
-        if(!obj.date || !obj.agent) return alert("បំពេញថ្ងៃខែ និងភ្នាក់ងារ!");
+        if(!obj.date || !obj.agent) return alert("សូមបំពេញថ្ងៃខែ និងភ្នាក់ងារ!");
         if(type === 'Deposit') { obj.cash = document.getElementById('dCash').value; obj.credit = document.getElementById('dCredit').value; }
         else { obj.gross = document.getElementById('uAds').value; obj.sim = document.getElementById('uSim').value; obj.home = document.getElementById('uHome').value; obj.fiber = document.getElementById('uFiber').value; obj.topup = document.getElementById('rTopup').value; obj.shop = document.getElementById('rShop').value; obj.dealer = document.getElementById('rDealer').value; obj.totalRev = document.getElementById('rTotal').value; }
         
         showMsg("⏳ កំពុងរក្សាទុក...", "var(--warning)");
-        fetch(API, { method: "POST", body: JSON.stringify(obj) }).then(() => { showMsg("✅ រក្សាទុកជោគជ័យ!", "var(--primary)"); load(); });
-        resetForm();
+        await fetch(API, { method: "POST", body: JSON.stringify(obj) });
+        showMsg("✅ រក្សាទុកជោគជ័យ!", "var(--primary)");
+        load(); resetForm();
     }
 
     async function del(type, idx) {
-        if(!confirm("លុបទិន្នន័យនេះ?")) return;
-        fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", recordType: type, rowIndex: idx}) }).then(() => load());
+        if(!confirm("តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះ?")) return;
+        showMsg("🗑️ កំពុងលុប...", "var(--danger)");
+        await fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", recordType: type, rowIndex: idx}) });
+        load();
     }
 
     function resetForm() {
