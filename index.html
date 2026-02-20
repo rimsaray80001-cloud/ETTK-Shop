@@ -3,144 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់ - Pro Dashboard</title>
+    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់</title>
     <style>
-        :root {
-            --primary: #219E42; --primary-dark: #1a7d34; --secondary: #1a73e8;
-            --danger: #e74c3c; --warning: #f39c12; --bg: #f8fafc; --white: #ffffff;
-            --text-main: #1e293b; --text-light: #64748b; --border: #e2e8f0;
-        }
-
-        body {
-            font-family: 'Kantumruy Pro', sans-serif;
-            margin: 0; background: var(--bg); color: var(--text-main);
-            display: flex; min-height: 100vh;
-        }
-
+        :root { --primary: #219E42; --secondary: #1a73e8; --danger: #e74c3c; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; display: flex; background: var(--bg); }
+        
         /* Sidebar Navigation */
-        .sidebar {
-            width: 280px; background: var(--primary); color: white;
-            height: 100vh; position: fixed; padding: 30px 20px;
-            box-sizing: border-box; display: flex; flex-direction: column;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 100;
-        }
-
-        .sidebar h2 { 
-            font-size: 20px; text-align: center; margin-bottom: 30px; 
-            border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px;
-        }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
-            color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 10px;
-            margin-bottom: 8px; transition: 0.3s; cursor: pointer;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.2); color: white;
-        }
-
-        /* Main Content */
-        .main { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h1 { font-size: 24px; margin: 0; color: var(--primary); }
-
-        /* Stats Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 40px; }
-        .stat-card {
-            background: var(--white); padding: 25px; border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border);
-            position: relative; overflow: hidden;
-        }
-        .stat-card::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--primary);
-        }
-        .stat-card small { color: var(--text-light); font-weight: 500; font-size: 14px; }
-        .stat-card .val { font-size: 32px; font-weight: 700; margin: 10px 0; color: var(--text-main); }
-        .growth { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
-        .up { color: var(--primary); } .down { color: var(--danger); }
+        .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 25px; box-sizing: border-box; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .sidebar h2 { font-size: 19px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-top: 0; }
+        .sidebar p { font-size: 14px; opacity: 0.8; }
+        
+        /* Main Content Area */
+        .main { margin-left: 260px; padding: 30px; width: calc(100% - 260px); box-sizing: border-box; }
+        
+        /* M-o-M Stats Display */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .stat-card small { color: #666; font-weight: 600; }
+        .stat-card .val { font-size: 28px; font-weight: 700; color: var(--primary); margin: 8px 0; display: block; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .badge-up { background: #e8f5e9; color: var(--primary); }
+        .badge-down { background: #fdecea; color: var(--danger); }
 
         /* Form Card */
-        .card { background: var(--white); border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid var(--border); }
-        .card h3 { margin-top: 0; margin-bottom: 25px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #eee; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .field { display: grid; gap: 5px; }
+        .field label { font-size: 13px; font-weight: 600; color: #555; }
+        input { padding: 12px; border: 1.5px solid #ddd; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
+        input:focus { border-color: var(--primary); }
 
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-group label { font-size: 13px; font-weight: 600; color: var(--text-light); }
-        input {
-            padding: 12px 15px; border: 1.5px solid var(--border); border-radius: 12px;
-            font-family: inherit; font-size: 14px; outline: none; transition: 0.2s;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(33, 158, 66, 0.1); }
+        /* Buttons */
+        .btn-save { background: var(--primary); color: white; width: 100%; margin-top: 20px; cursor: pointer; border: none; border-radius: 10px; padding: 14px; font-family: inherit; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { background: #1a7d34; }
+        .btn-refresh { background: rgba(255,255,255,0.2); color: white; border: 1px solid white; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; font-family: inherit; margin-top: 15px; font-weight: 600; }
 
-        .btn-group { display: flex; gap: 15px; margin-top: 25px; }
-        button {
-            cursor: pointer; border: none; border-radius: 12px; padding: 12px 25px;
-            font-family: inherit; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .btn-outline { background: var(--white); color: var(--primary); border: 1.5px solid var(--primary); }
+        /* Data Table */
+        .table-container { overflow-x: auto; background: white; border-radius: 15px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; color: #64748b; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .action-icon { cursor: pointer; margin-right: 12px; font-size: 16px; }
+        .action-icon.edit { color: var(--secondary); }
+        .action-icon.delete { color: var(--danger); }
 
-        /* Table Design */
-        .table-container { overflow-x: auto; background: var(--white); border-radius: 20px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8fafc; padding: 18px 20px; text-align: left; font-size: 13px; color: var(--text-light); border-bottom: 1.5px solid var(--border); }
-        td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        tr:hover { background: #fdfdfd; }
-
-        .action-btns { display: flex; gap: 10px; }
-        .edit-btn { color: var(--secondary); cursor: pointer; font-size: 16px; }
-        .delete-btn { color: var(--danger); cursor: pointer; font-size: 16px; }
-
-        /* Loading Animation */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; margin: 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>ស្មាតសប ត្រាំកក់</h2>
-    <div class="nav-link active"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
-    <div class="nav-link" onclick="loadData()"><i class="fa-solid fa-rotate"></i> ធ្វើបច្ចុប្បន្នភាព</div>
-    <div class="nav-link" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-user-gear"></i> ការកំណត់</div>
+    <h2>ស្មាតសប អ៊េចប្រេស</h2>
+    <p>សាខា: ត្រាំកក់</p>
+    <hr style="border:0.5px solid rgba(255,255,255,0.1)">
+    <button class="btn-refresh" onclick="loadData()"><i class="fa-solid fa-sync"></i> Refresh Data</button>
 </div>
 
 <div class="main">
-    <div class="loading-overlay" id="loader"><div class="spinner"></div></div>
-
-    <div class="header">
-        <h1>ផ្ទាំងគ្រប់គ្រងការលក់</h1>
-        <div id="dateNow" style="font-weight: 600; color: var(--text-light);"></div>
-    </div>
-
-    <div class="stats-grid" id="statsContainer"></div>
+    <div class="stats-grid" id="statsGrid"></div>
 
     <div class="card">
-        <h3 id="formTitle"><i class="fa-solid fa-file-pen"></i> បញ្ចូលទិន្នន័យថ្មី</h3>
-        <div class="form-grid">
-            <div class="input-group"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
-            <div class="input-group"><label>ភ្នាក់ងារ</label><input type="text" id="agent" placeholder="ឈ្មោះបុគ្គលិក"></div>
-            <div class="input-group"><label>Gross</label><input type="number" id="gross" placeholder="0"></div>
-            <div class="input-group"><label>Sim</label><input type="number" id="sim" placeholder="0"></div>
-            <div class="input-group"><label>TopUp ($)</label><input type="number" id="topup" placeholder="0.00"></div>
-            <div class="input-group"><label>Shop ($)</label><input type="number" id="shop" placeholder="0.00"></div>
-            <div class="input-group"><label>Dealer ($)</label><input type="number" id="dealer" placeholder="0.00"></div>
-            <div class="input-group"><label>សរុប ($)</label><input type="number" id="totalrev" placeholder="0.00" style="font-weight: 700; color: var(--primary);"></div>
+        <h3 id="formTitle" style="margin-top:0; color: var(--primary);">បញ្ចូលទិន្នន័យប្រចាំថ្ងៃ</h3>
+        <div class="input-grid">
+            <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
+            <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="agent"></div>
+            <div class="field"><label>Gross</label><input type="number" id="gross"></div>
+            <div class="field"><label>Sim</label><input type="number" id="sim"></div>
+            <div class="field"><label>TopUp ($)</label><input type="number" id="topup"></div>
+            <div class="field"><label>Shop ($)</label><input type="number" id="shop"></div>
+            <div class="field"><label>Dealer ($)</label><input type="number" id="dealer"></div>
+            <div class="field"><label>សរុប ($)</label><input type="number" id="totalrev" style="border: 2px solid var(--primary); font-weight:bold;"></div>
         </div>
-        <div class="btn-group">
-            <button class="btn-primary" id="saveBtn" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i> រក្សាទុកទិន្នន័យ</button>
-            <button class="btn-outline" onclick="resetForm()">សម្អាត</button>
-        </div>
+        <button class="btn-save" id="saveBtn" onclick="saveData()">រក្សាទុកទិន្នន័យ</button>
+        <div class="loader" id="loader"></div>
     </div>
 
-    <div class="card">
-        <h3><i class="fa-solid fa-list-check"></i> បញ្ជីទិន្នន័យចុងក្រោយ</h3>
+    <div class="card" style="padding:0">
         <div class="table-container">
             <table>
                 <thead>
@@ -148,8 +89,8 @@
                         <th>ថ្ងៃខែ</th>
                         <th>ភ្នាក់ងារ</th>
                         <th>Gross/Sim</th>
-                        <th>TopUp/Shop/Dlr</th>
-                        <th>ចំណូលសរុប</th>
+                        <th>T/S/D ($)</th>
+                        <th>សរុប ($)</th>
                         <th>សកម្មភាព</th>
                     </tr>
                 </thead>
@@ -163,18 +104,16 @@
     const API = "https://script.google.com/macros/s/AKfycbyVmsOGm-20o8qnz0fgATA7vmEO48AbaCHjP0WfUjYp6Y4GUxpEi0TXa5jBH02EWbAFTg/exec";
     let state = { store: [], editIndex: null };
 
-    // Initialize
     document.getElementById('date').valueAsDate = new Date();
-    document.getElementById('dateNow').innerText = new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     async function loadData() {
-        toggleLoader(true);
+        document.getElementById('loader').style.display = "block";
         try {
             const res = await fetch(API);
             state.store = await res.json();
             render();
-        } catch (e) { alert("មិនអាចភ្ជាប់ទៅ API បានទេ!"); }
-        toggleLoader(false);
+        } catch (e) { alert("Error connecting to API!"); }
+        document.getElementById('loader').style.display = "none";
     }
 
     function render() {
@@ -187,57 +126,53 @@
         const body = document.getElementById('tableBody');
         body.innerHTML = "";
 
-        state.store.reverse().forEach(i => {
+        // Render from newest to oldest
+        [...state.store].reverse().forEach(i => {
             const p = (i.date || "").split(/[-T/]/);
             if(p.length < 3) return;
             const iy = parseInt(p[0]), im = parseInt(p[1]), id = parseInt(p[2]);
 
-            // Stats Logic
+            // M-o-M Comparison Logic
             if (im === tMonth && iy === tYear) { curV += parseFloat(i.totalrev || 0); curG += parseFloat(i.gross || 0); }
             if (im === preMonth && iy === preYear && id <= tDay) { preV += parseFloat(i.totalrev || 0); preG += parseFloat(i.gross || 0); }
 
-            // Table Row
             body.innerHTML += `<tr>
                 <td>${i.date.substring(0,10)}</td>
-                <td><span style="font-weight:600">${i.agent}</span></td>
-                <td><i class="fa-solid fa-box" style="font-size:12px;color:#999"></i> ${i.gross} / ${i.sim}</td>
-                <td>$${i.topup} / $${i.shop} / $${i.dealer}</td>
-                <td><span style="color:var(--primary); font-weight:700">$${parseFloat(i.totalrev||0).toFixed(2)}</span></td>
+                <td><b>${i.agent}</b></td>
+                <td>${i.gross} / ${i.sim}</td>
+                <td>${i.topup} / ${i.shop} / ${i.dealer}</td>
+                <td style="color:var(--primary); font-weight:700">$${parseFloat(i.totalrev||0).toFixed(2)}</td>
                 <td>
-                    <div class="action-btns">
-                        <i class="fa-solid fa-pen-to-square edit-btn" onclick="editRow(${i.rowindex})"></i>
-                        <i class="fa-solid fa-trash delete-btn" onclick="deleteRow(${i.rowindex})"></i>
-                    </div>
+                    <i class="fa-solid fa-pen-to-square action-icon edit" onclick="editRow(${i.rowindex})" title="Edit"></i>
+                    <i class="fa-solid fa-trash action-icon delete" onclick="deleteRow(${i.rowindex})" title="Delete"></i>
                 </td>
             </tr>`;
         });
-        updateStats(curV, preV, curG, preG);
+        renderCards(curV, preV, curG, preG, tDay);
     }
 
-    function updateStats(cv, pv, cg, pg) {
+    function renderCards(cv, pv, cg, pg, day) {
         const build = (title, val, old, is$) => {
-            const diff = val - old;
-            const pct = old > 0 ? ((diff / old) * 100).toFixed(0) : 0;
-            const up = diff >= 0;
+            const diff = val - old, pct = old > 0 ? ((diff / old) * 100).toFixed(0) : 0, up = diff >= 0;
             return `
                 <div class="stat-card">
-                    <small>${title}</small>
-                    <div class="val">${is$?'$':''}${val.toLocaleString()}</div>
-                    <div class="growth ${up?'up':'down'}">
-                        <i class="fa-solid fa-arrow-${up?'up':'down'}"></i> 
-                        ${up?'+':''}${pct}% <span style="color:#999; font-weight:normal">ធៀបខែមុន</span>
-                    </div>
+                    <small>${title} (ត្រឹមថ្ងៃទី ${day})</small>
+                    <span class="val">${is$ ? '$' : ''}${val.toLocaleString()}</span>
+                    <span class="badge ${up ? 'badge-up' : 'badge-down'}">
+                        <i class="fa-solid fa-arrow-${up ? 'up' : 'down'}"></i> ${up ? '+' : ''}${pct}%
+                    </span>
+                    <span style="font-size:12px; color:#999; margin-left:5px">ខែមុន: ${old.toLocaleString()}</span>
                 </div>`;
         };
-        document.getElementById('statsContainer').innerHTML = build("ចំណូលសរុបខែនេះ", cv, pv, true) + build("Gross សរុបខែនេះ", cg, pg, false);
+        document.getElementById('statsGrid').innerHTML = build("ចំណូលសរុបខែនេះ", cv, pv, true) + build("Gross សរុបខែនេះ", cg, pg, false);
     }
 
     async function saveData() {
         const agent = document.getElementById('agent').value;
         if(!agent) return alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
 
-        toggleLoader(true);
-        const p = {
+        document.getElementById('loader').style.display = "block";
+        const payload = {
             action: state.editIndex ? "UPDATE" : "ADD",
             rowIndex: state.editIndex,
             date: document.getElementById('date').value,
@@ -249,16 +184,22 @@
             dealer: document.getElementById('dealer').value || 0,
             totalrev: document.getElementById('totalrev').value || 0
         };
-        
-        await fetch(API, { method: "POST", body: JSON.stringify(p) });
-        resetForm();
-        await loadData();
+
+        try {
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            state.editIndex = null;
+            document.getElementById('formTitle').innerText = "បញ្ចូលទិន្នន័យប្រចាំថ្ងៃ";
+            loadData();
+            // Clear inputs except date
+            document.querySelectorAll('input').forEach(i => i.id !== 'date' ? i.value="" : null);
+        } catch (e) { alert("Save Failed!"); }
+        document.getElementById('loader').style.display = "none";
     }
 
     function editRow(idx) {
         const item = state.store.find(i => i.rowindex === idx);
         state.editIndex = idx;
-        document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> កែសម្រួលទិន្នន័យជួរទី ${idx}`;
+        document.getElementById('formTitle').innerText = "កែសម្រួលទិន្នន័យជួរទី " + idx;
         document.getElementById('date').value = (item.date||"").substring(0,10);
         document.getElementById('agent').value = item.agent;
         document.getElementById('gross').value = item.gross;
@@ -271,19 +212,12 @@
     }
 
     async function deleteRow(idx) {
-        if(!confirm("តើអ្នកពិតជាចង់លុបទិន្នន័យនេះមែនទេ?")) return;
-        toggleLoader(true);
-        await fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", rowIndex: idx}) });
-        await loadData();
+        if(confirm("តើអ្នកច្បាស់ទេថានឹងលុបទិន្នន័យជួរទី " + idx + "?")) {
+            document.getElementById('loader').style.display = "block";
+            await fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", rowIndex: idx}) });
+            loadData();
+        }
     }
-
-    function resetForm() {
-        state.editIndex = null;
-        document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-file-pen"></i> បញ្ចូលទិន្នន័យថ្មី`;
-        document.querySelectorAll('input').forEach(i => i.id !== 'date' ? i.value = "" : null);
-    }
-
-    function toggleLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
     loadData();
 </script>
