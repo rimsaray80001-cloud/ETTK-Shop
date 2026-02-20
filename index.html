@@ -20,7 +20,7 @@
         
         /* Summary Cards */
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .summary-card { background: white; padding: 22px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 15px; border-top: 4px solid var(--primary); }
+        .summary-card { background: white; padding: 22px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-top: 4px solid var(--primary); }
         .summary-info h4 { margin: 0; font-size: 13px; color: #777; font-weight: 500; }
         .summary-info p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: #222; }
 
@@ -28,8 +28,8 @@
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
         h3 { border-left: 5px solid var(--primary); padding-left: 12px; font-size: 17px; font-weight: 700; margin: 0 0 20px 0; color: var(--primary); }
         
-        /* Compact Grid for Sales (៤ ជួរ) */
-        .sales-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        /* Compact Grid Layout */
+        .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 12.5px; margin-bottom: 5px; color: #555; font-weight: 600; }
         
@@ -43,18 +43,20 @@
         .btn-save { background: var(--primary); color: white; border: none; padding: 12px 35px; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-left: auto; transition: 0.2s; }
         .btn-save:hover { background: #1a8235; transform: translateY(-2px); }
 
-        /* Table UI */
+        /* Table */
         .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #edf2f7; background: white; }
         table { width: 100%; border-collapse: collapse; min-width: 850px; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; color: #64748b; border-bottom: 2px solid #edf2f7; }
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         
         .action-btns { display: flex; gap: 5px; }
-        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .edit-btn { background: #fff9db; color: #f59f00; }
         .del-btn { background: #fff5f5; color: #fa5252; }
+        .edit-btn:hover { background: #f59f00; color: white; }
+        .del-btn:hover { background: #fa5252; color: white; }
 
-        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; font-weight: 600; z-index: 1000; display: none; }
+        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; font-weight: 600; z-index: 1000; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .hidden { display: none; }
     </style>
 </head>
@@ -71,7 +73,7 @@
 
     <div class="summary-grid">
         <div class="summary-card" style="border-top-color: var(--warning)">
-            <div class="summary-info"><h4>ស្ថានភាព Growth</h4><div id="growthVal" style="font-weight:700;">Active</div></div>
+            <div class="summary-info"><h4>ស្ថានភាព</h4><div style="color: var(--warning); font-weight:700;">Active</div></div>
         </div>
         <div class="summary-card">
             <div class="summary-info"><h4>លក់សរុបខែនេះ</h4><p id="sumSales">$0.00</p></div>
@@ -84,7 +86,7 @@
     <div id="depositTab">
         <div class="card">
             <h3><i class="fa-solid fa-circle-plus"></i> បញ្ចូលការដាក់ប្រាក់</h3>
-            <div class="sales-grid">
+            <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែឆ្នាំ</label><input type="date" id="dDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="dAgent" placeholder="ឈ្មោះ..."></div>
                 <div class="field"><label>Cash ($)</label><input type="number" id="dCash" value="0"></div>
@@ -104,19 +106,19 @@
     <div id="salesTab" class="hidden">
         <div class="card">
             <h3><i class="fa-solid fa-cart-shopping"></i> បញ្ចូលការលក់ប្រចាំថ្ងៃ</h3>
-            <div class="sales-grid">
+            <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែឆ្នាំ</label><input type="date" id="sDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="sAgent" placeholder="ឈ្មោះ..."></div>
                 <div class="field"><label style="color:var(--unit)">Ads/Gross</label><input type="number" id="uAds" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Sim</label><input type="number" id="uSim" class="input-unit" value="0"></div>
             </div>
-            <div class="sales-grid">
+            <div class="compact-grid">
                 <div class="field"><label style="color:var(--unit)">Home</label><input type="number" id="uHome" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Fiber</label><input type="number" id="uFiber" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">Top Up ($)</label><input type="number" id="rTopup" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">SC Shop ($)</label><input type="number" id="rShop" class="input-curr" value="0"></div>
             </div>
-            <div class="sales-grid">
+            <div class="compact-grid">
                 <div class="field"><label style="color:var(--curr)">SC Dealer ($)</label><input type="number" id="rDealer" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--primary)">សរុបការលក់ ($)</label><input type="number" id="rTotal" class="input-total" value="0"></div>
                 <div class="field"></div><div class="field"></div>
@@ -133,7 +135,7 @@
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbyLesLitTZlTkA4OlLnFON5I-fHFbKhv0avEwn0v61w5KOJLMQLVsMwXzZ4TNf1PlsMyA/exec";
+    const API = "https://script.google.com/macros/s/AKfycbxGxYKg7ExTCHkyoM3-wVgCfzFq7zISzHfeSu3i2ERfPWdzGbBbnpsuIfxp84TBUWNV9g/exec";
     let state = { store: [], isEdit: false, editIdx: null };
 
     function showTab(t, b) {
@@ -152,17 +154,17 @@
             render();
             calculateSummary();
             document.getElementById('status').style.display = 'none';
-        } catch(e) { showMsg("❌ កំហុសក្នុងការទាញទិន្នន័យ!", "red"); }
+        } catch(e) { showMsg("❌ កំហុសបច្ចេកទេស!", "var(--danger)"); }
     }
 
     function calculateSummary() {
         const now = new Date();
-        const curM = now.getMonth(), curY = now.getFullYear();
+        const curM = now.getMonth() + 1, curY = now.getFullYear();
         let totalRev = 0, totalSim = 0;
         state.store.forEach(item => {
-            if (item.recordType === "Sales") {
-                const [y, m, d] = item.date.split('-').map(Number);
-                if ((m - 1) === curM && y === curY) {
+            if (item.recordType === "Sales" && item.date) {
+                const parts = item.date.split('-');
+                if (parseInt(parts[1]) === curM && parseInt(parts[0]) === curY) {
                     totalRev += parseFloat(item.totalRev || 0);
                     totalSim += parseFloat(item.sim || 0);
                 }
@@ -177,7 +179,7 @@
         dBody.innerHTML = sBody.innerHTML = "";
         state.store.forEach(item => {
             const row = `<tr>
-                <td>${item.date}</td><td><b>${item.agent}</b></td>
+                <td>${item.date || '---'}</td><td><b>${item.agent}</b></td>
                 ${item.recordType === 'Deposit' ? 
                 `<td>$${item.cash}</td><td>$${item.credit}</td><td><small>${item.remark}</small></td>` : 
                 `<td style="color:var(--unit)">${item.gross}/${item.sim}/${item.home}/${item.fiber}</td><td style="color:var(--curr)">${item.topup}/${item.shop}/${item.dealer}</td><td style="color:var(--primary); font-weight:700;">$${parseFloat(item.totalRev).toFixed(2)}</td>`}
@@ -241,7 +243,7 @@
 
     function showMsg(t, c) {
         const s = document.getElementById('status');
-        s.style.display = 'block'; s.innerText = t; s.style.background = (c.startsWith('var')) ? `var(--${c.split('--')[1].split(')')[0]})` : c;
+        s.style.display = 'block'; s.innerText = t; s.style.background = `var(--${c.split('--')[1].split(')')[0]})`;
         if(!t.includes("🔄")) setTimeout(() => s.style.display = 'none', 3000);
     }
 
