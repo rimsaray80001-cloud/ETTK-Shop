@@ -9,51 +9,35 @@
     <style>
         :root { --primary: #219E42; --danger: #e74c3c; --warning: #f39c12; --bg: #f4f7f6; --unit: #1a73e8; --curr: #e67e22; }
         body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; display: flex; background: var(--bg); min-height: 100vh; color: #333; }
-        
-        /* Sidebar */
         .sidebar { width: 260px; background: var(--primary); height: 100vh; position: fixed; padding: 40px 15px; box-sizing: border-box; color: white; z-index: 100; }
         .sidebar h2 { font-size: 19px; margin-bottom: 40px; font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; line-height: 1.5; }
         .nav-btn { width: 100%; padding: 12px 15px; margin-bottom: 8px; border: none; background: transparent; border-radius: 10px; cursor: pointer; text-align: left; font-family: inherit; font-size: 15px; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 12px; transition: 0.3s; }
         .nav-btn.active { background: white; color: var(--primary); font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
         .main { margin-left: 260px; padding: 30px; width: calc(100% - 260px); box-sizing: border-box; }
-        
-        /* Summary Cards */
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .summary-card { background: white; padding: 22px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-top: 4px solid var(--primary); }
         .summary-info h4 { margin: 0; font-size: 13px; color: #777; font-weight: 500; }
         .summary-info p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: #222; }
-
-        /* Form Styling */
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
         h3 { border-left: 5px solid var(--primary); padding-left: 12px; font-size: 17px; font-weight: 700; margin: 0 0 20px 0; color: var(--primary); }
-        
-        /* Compact Grid Layout (ជួរទី១ មាន ៤ Textbox) */
         .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 12.5px; margin-bottom: 5px; color: #555; font-weight: 600; }
-        
         input { padding: 10px 14px; border: 2px solid #edf2f7; border-radius: 10px; font-family: inherit; font-size: 14px; transition: 0.3s; background: #fdfdfd; }
         input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(33, 158, 66, 0.08); }
-        
         .input-unit { border-color: #d1e3fa; color: var(--unit); font-weight: 600; }
         .input-curr { border-color: #fbe6d5; color: var(--curr); font-weight: 600; }
         .input-total { border-color: var(--primary); background: #f0fdf4; font-weight: 700; color: var(--primary); }
-
         .btn-save { background: var(--primary); color: white; border: none; padding: 12px 35px; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-left: auto; transition: 0.2s; }
         .btn-save:hover { background: #1a8235; transform: translateY(-2px); }
-
-        /* Table */
         .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #edf2f7; background: white; }
         table { width: 100%; border-collapse: collapse; min-width: 850px; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; color: #64748b; border-bottom: 2px solid #edf2f7; }
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        
         .action-btns { display: flex; gap: 5px; }
-        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .edit-btn { background: #fff9db; color: #f59f00; }
         .del-btn { background: #fff5f5; color: #fa5252; }
-
         #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; font-weight: 600; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .hidden { display: none; }
     </style>
@@ -68,17 +52,10 @@
 
 <div class="main">
     <div id="status"></div>
-
     <div class="summary-grid">
-        <div class="summary-card" style="border-top-color: var(--warning)">
-            <div class="summary-info"><h4>ស្ថានភាព</h4><div style="color: var(--warning); font-weight:700;">Active</div></div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-info"><h4>លក់សរុបខែនេះ</h4><p id="sumSales">$0.00</p></div>
-        </div>
-        <div class="summary-card" style="border-top-color: var(--unit)">
-            <div class="summary-info"><h4>SIM សរុបខែនេះ</h4><p id="sumSim">0</p></div>
-        </div>
+        <div class="summary-card" style="border-top-color: var(--warning)"><div class="summary-info"><h4>ស្ថានភាព</h4><div style="color: var(--warning); font-weight:700;">Active</div></div></div>
+        <div class="summary-card"><div class="summary-info"><h4>លក់សរុបខែនេះ</h4><p id="sumSales">$0.00</p></div></div>
+        <div class="summary-card" style="border-top-color: var(--unit)"><div class="summary-info"><h4>SIM សរុបខែនេះ</h4><p id="sumSim">0</p></div></div>
     </div>
 
     <div id="depositTab">
@@ -104,27 +81,23 @@
     <div id="salesTab" class="hidden">
         <div class="card">
             <h3><i class="fa-solid fa-cart-shopping"></i> បញ្ចូលការលក់ប្រចាំថ្ងៃ</h3>
-            
             <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែឆ្នាំ</label><input type="date" id="sDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="sAgent" placeholder="ឈ្មោះ..."></div>
                 <div class="field"><label style="color:var(--unit)">Ads/Gross</label><input type="number" id="uAds" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Sim</label><input type="number" id="uSim" class="input-unit" value="0"></div>
             </div>
-
             <div class="compact-grid">
                 <div class="field"><label style="color:var(--unit)">Home</label><input type="number" id="uHome" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Fiber</label><input type="number" id="uFiber" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">Top Up ($)</label><input type="number" id="rTopup" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">SC Shop ($)</label><input type="number" id="rShop" class="input-curr" value="0"></div>
             </div>
-
             <div class="compact-grid">
                 <div class="field"><label style="color:var(--curr)">SC Dealer ($)</label><input type="number" id="rDealer" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--primary)">សរុបការលក់ ($)</label><input type="number" id="rTotal" class="input-total" value="0"></div>
                 <div class="field"></div><div class="field"></div>
             </div>
-
             <button class="btn-save" onclick="save('Sales')"><i class="fa-solid fa-circle-check"></i> រក្សាទុក</button>
         </div>
         <div class="table-container">
@@ -138,7 +111,6 @@
 
 <script>
     const API = "https://script.google.com/macros/s/AKfycbx1B-HwEH2XmsC-8L4U72sE6w7tOWfCw86l8-tzDh023O0ImMU5BoeN-J07Ag6-8pT0/exec";
-    
     let state = { store: [], isEdit: false, editIdx: null };
 
     function showTab(t, b) {
@@ -157,7 +129,7 @@
             render();
             calculateSummary();
             document.getElementById('status').style.display = 'none';
-        } catch(e) { showMsg("❌ កំហុសបច្ចេកទេស!", "var(--danger)"); }
+        } catch(e) { showMsg("❌ Error!", "var(--danger)"); }
     }
 
     function calculateSummary() {
@@ -196,6 +168,7 @@
         });
     }
 
+    // មុខងារកែសម្រួលថ្មី៖ "រក្សាទុកភ្លាម បង្ហាញភ្លាម"
     async function save(type) {
         const d = (type === 'Deposit' ? document.getElementById('dDate').value : document.getElementById('sDate').value);
         const a = (type === 'Deposit' ? document.getElementById('dAgent').value : document.getElementById('sAgent').value);
@@ -210,17 +183,37 @@
             obj.topup = document.getElementById('rTopup').value; obj.shop = document.getElementById('rShop').value;
             obj.dealer = document.getElementById('rDealer').value; obj.totalRev = document.getElementById('rTotal').value;
         }
+
+        // --- ជំហាន Optimistic Update (បង្ហាញភ្លាមៗ) ---
+        if (state.isEdit) {
+            const idx = state.store.findIndex(i => i.recordType === type && i.rowIndex === state.editIdx);
+            if (idx > -1) state.store[idx] = { ...state.store[idx], ...obj };
+        } else {
+            // បន្ថែមចូលបណ្តោះអាសន្ន (rowIndex ប្រើសិន)
+            state.store.unshift({ ...obj, rowIndex: Date.now() }); 
+        }
         
-        showMsg("🔄 កំពុងរក្សាទុក...", "var(--warning)");
-        await fetch(API, { method: "POST", body: JSON.stringify(obj) });
-        resetForm(); load();
+        render(); // បង្ហាញក្នុងតារាងភ្លាម
+        calculateSummary(); // គណនាផលសរុបភ្លាម
+        resetForm(); // សម្អាត Form ភ្លាម
+        showMsg("✅ រក្សាទុកជោគជ័យ!", "var(--primary)");
+
+        // ផ្ញើទៅ Server នៅពីក្រោយ (Background)
+        fetch(API, { method: "POST", body: JSON.stringify(obj) })
+            .then(() => { console.log("Server Updated"); load(); }) // ទាញទិន្នន័យពិតប្រាកដមកវិញពេលក្រោយ
+            .catch(err => showMsg("❌ កំហុសពេលបញ្ជូនទៅ Server", "var(--danger)"));
     }
 
     async function del(type, idx) {
         if(!confirm("តើអ្នកចង់លុបទិន្នន័យនេះមែនទេ?")) return;
-        showMsg("🗑 កំពុងលុប...", "var(--danger)");
-        await fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", recordType: type, rowIndex: idx}) });
-        load();
+        
+        // លុបចេញពីអេក្រង់ភ្លាម
+        state.store = state.store.filter(i => !(i.recordType === type && i.rowIndex === idx));
+        render();
+        calculateSummary();
+
+        fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", recordType: type, rowIndex: idx}) })
+            .then(() => load());
     }
 
     function startEdit(type, idx) {
@@ -248,7 +241,7 @@
     function showMsg(t, c) {
         const s = document.getElementById('status');
         s.style.display = 'block'; s.innerText = t; s.style.background = `var(--${c.split('--')[1].split(')')[0]})`;
-        if(!t.includes("🔄")) setTimeout(() => s.style.display = 'none', 3000);
+        setTimeout(() => s.style.display = 'none', 3000);
     }
 
     window.onload = load;
