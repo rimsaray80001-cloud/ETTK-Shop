@@ -28,7 +28,7 @@
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
         h3 { border-left: 5px solid var(--primary); padding-left: 12px; font-size: 17px; font-weight: 700; margin: 0 0 20px 0; color: var(--primary); }
         
-        /* Compact Grid Layout */
+        /* Compact Grid Layout (ជួរទី១ មាន ៤ Textbox) */
         .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 12.5px; margin-bottom: 5px; color: #555; font-weight: 600; }
@@ -50,13 +50,11 @@
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         
         .action-btns { display: flex; gap: 5px; }
-        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .icon-btn { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .edit-btn { background: #fff9db; color: #f59f00; }
         .del-btn { background: #fff5f5; color: #fa5252; }
-        .edit-btn:hover { background: #f59f00; color: white; }
-        .del-btn:hover { background: #fa5252; color: white; }
 
-        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; font-weight: 600; z-index: 1000; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; font-weight: 600; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .hidden { display: none; }
     </style>
 </head>
@@ -106,23 +104,27 @@
     <div id="salesTab" class="hidden">
         <div class="card">
             <h3><i class="fa-solid fa-cart-shopping"></i> បញ្ចូលការលក់ប្រចាំថ្ងៃ</h3>
+            
             <div class="compact-grid">
                 <div class="field"><label>ថ្ងៃខែឆ្នាំ</label><input type="date" id="sDate"></div>
                 <div class="field"><label>ភ្នាក់ងារ</label><input type="text" id="sAgent" placeholder="ឈ្មោះ..."></div>
                 <div class="field"><label style="color:var(--unit)">Ads/Gross</label><input type="number" id="uAds" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Sim</label><input type="number" id="uSim" class="input-unit" value="0"></div>
             </div>
+
             <div class="compact-grid">
                 <div class="field"><label style="color:var(--unit)">Home</label><input type="number" id="uHome" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--unit)">Fiber</label><input type="number" id="uFiber" class="input-unit" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">Top Up ($)</label><input type="number" id="rTopup" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--curr)">SC Shop ($)</label><input type="number" id="rShop" class="input-curr" value="0"></div>
             </div>
+
             <div class="compact-grid">
                 <div class="field"><label style="color:var(--curr)">SC Dealer ($)</label><input type="number" id="rDealer" class="input-curr" value="0"></div>
                 <div class="field"><label style="color:var(--primary)">សរុបការលក់ ($)</label><input type="number" id="rTotal" class="input-total" value="0"></div>
                 <div class="field"></div><div class="field"></div>
             </div>
+
             <button class="btn-save" onclick="save('Sales')"><i class="fa-solid fa-circle-check"></i> រក្សាទុក</button>
         </div>
         <div class="table-container">
@@ -135,7 +137,8 @@
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbxGxYKg7ExTCHkyoM3-wVgCfzFq7zISzHfeSu3i2ERfPWdzGbBbnpsuIfxp84TBUWNV9g/exec";
+    const API = "https://script.google.com/macros/s/AKfycbx1B-HwEH2XmsC-8L4U72sE6w7tOWfCw86l8-tzDh023O0ImMU5BoeN-J07Ag6-8pT0/exec";
+    
     let state = { store: [], isEdit: false, editIdx: null };
 
     function showTab(t, b) {
@@ -178,8 +181,9 @@
         const dBody = document.getElementById('depBody'), sBody = document.getElementById('salBody');
         dBody.innerHTML = sBody.innerHTML = "";
         state.store.forEach(item => {
+            const dateStr = item.date || '---';
             const row = `<tr>
-                <td>${item.date || '---'}</td><td><b>${item.agent}</b></td>
+                <td>${dateStr}</td><td><b>${item.agent}</b></td>
                 ${item.recordType === 'Deposit' ? 
                 `<td>$${item.cash}</td><td>$${item.credit}</td><td><small>${item.remark}</small></td>` : 
                 `<td style="color:var(--unit)">${item.gross}/${item.sim}/${item.home}/${item.fiber}</td><td style="color:var(--curr)">${item.topup}/${item.shop}/${item.dealer}</td><td style="color:var(--primary); font-weight:700;">$${parseFloat(item.totalRev).toFixed(2)}</td>`}
