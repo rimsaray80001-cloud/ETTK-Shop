@@ -3,266 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់ - Full Dashboard Fix</title>
+    <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់ - Dashboard</title>
     <style>
-        :root { 
-            --primary: #219E42; --danger: #e74c3c; --warning: #f39c12; 
-            --bg: #f4f7f6; --unit: #1a73e8; --curr: #e67e22; 
-            --white: #ffffff; --dark: #2c3e50;
-        }
-        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; display: flex; background: var(--bg); min-height: 100vh; }
-        .sidebar { width: 260px; background: var(--primary); height: 100vh; position: fixed; padding: 40px 15px; box-sizing: border-box; color: white; z-index: 100; }
-        .sidebar h2 { font-size: 19px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
-        .nav-btn { width: 100%; padding: 14px 15px; margin-bottom: 10px; border: none; background: transparent; border-radius: 12px; cursor: pointer; text-align: left; font-family: inherit; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 12px; }
-        .nav-btn.active { background: var(--white); color: var(--primary); font-weight: 700; }
+        :root { --primary: #219E42; --secondary: #1a73e8; --danger: #e74c3c; --bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        
+        /* Layout */
+        .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 25px; box-sizing: border-box; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
         .main { margin-left: 260px; padding: 30px; width: calc(100% - 260px); box-sizing: border-box; }
         
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .filter-group { display: flex; background: #e2e8f0; padding: 5px; border-radius: 15px; gap: 5px; }
-        .filter-btn { border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: #64748b; }
-        .filter-btn.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 35px; }
-        .stat-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-bottom: 5px solid #eee; transition: 0.3s; }
+        /* Stats Card */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
         .stat-card:hover { transform: translateY(-5px); }
-        .stat-card h4 { margin: 0; font-size: 14px; color: #7f8c8d; display: flex; align-items: center; gap: 8px; }
-        .stat-card .val { font-size: 24px; font-weight: 700; margin: 12px 0; display: block; color: var(--dark); }
-        .stat-card .diff { font-size: 13px; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
-        .up { color: var(--primary); }
-        .down { color: var(--danger); }
+        .stat-card small { color: #777; font-weight: 600; display: block; margin-bottom: 5px; }
+        .stat-card .val { font-size: 28px; font-weight: 700; margin: 10px 0; display: block; }
+        
+        /* Form & Table */
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .field { display: grid; }
+        .field small { margin-bottom: 5px; font-weight: 600; color: #555; }
+        input { padding: 12px; border: 1.5px solid #eee; border-radius: 10px; font-family: inherit; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(33, 158, 66, 0.2); }
+        
+        button { cursor: pointer; border: none; border-radius: 10px; padding: 12px 20px; font-family: inherit; font-weight: 600; transition: 0.2s; }
+        .btn-save { background: var(--primary); color: white; width: 100%; margin-top: 15px; font-size: 16px; }
+        .btn-save:hover { background: #1a7d34; }
+        .btn-refresh { background: var(--white); color: var(--primary); width: 100%; margin-top: 20px; border: 2px solid white; }
+        .btn-refresh:hover { background: rgba(255,255,255,0.1); color: white; }
 
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .field { display: flex; flex-direction: column; }
-        .field label { font-size: 13px; margin-bottom: 8px; font-weight: 600; }
-        input { padding: 12px 15px; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; outline: none; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 14px 40px; border-radius: 12px; cursor: pointer; font-weight: 700; margin-left: auto; display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 13px; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         
-        .table-container { overflow-x: auto; border-radius: 15px; background: white; border: 1px solid #edf2f7; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8fafc; padding: 18px 15px; text-align: left; font-size: 13px; color: #64748b; }
-        td { padding: 16px 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .badge-up { color: var(--primary); background: #e8f5e9; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        .badge-down { color: var(--danger); background: #fdecea; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
         
-        #status { position: fixed; top: 25px; right: 25px; padding: 15px 25px; border-radius: 10px; color: white; z-index: 1001; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .hidden { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 25px; height: 25px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2><i class="fa-solid fa-store"></i> ស្មាតសប អ៊េចប្រេស</h2>
-    <button class="nav-btn active" onclick="showTab('sales', this)"><i class="fa-solid fa-chart-line"></i> ការលក់ប្រចាំថ្ងៃ</button>
-    <button class="nav-btn" onclick="showTab('deposit', this)"><i class="fa-solid fa-wallet"></i> ការដាក់ប្រាក់</button>
+    <h2 style="margin-top:0"><i class="fa-solid fa-store"></i> ស្មាតសប អ៊េចប្រេស</h2>
+    <p style="opacity:0.8; font-size: 14px;">សាខា: ត្រាំកក់</p>
+    <hr style="border: 0.5px solid rgba(255,255,255,0.2); margin: 20px 0;">
+    <button class="btn-refresh" onclick="loadData()"><i class="fa-solid fa-arrows-rotate"></i> Refresh Data</button>
 </div>
 
 <div class="main">
-    <div id="status"></div>
-    <div class="dashboard-header">
-        <div>
-            <h1><i class="fa-solid fa-gauge-high"></i> Dashboard វិភាគ</h1>
-            <small id="rangeLabel" style="color: var(--primary); font-weight: 600;"></small>
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="card">
+        <h3 id="formTitle" style="margin-top:0; color: var(--primary);">បញ្ចូលទិន្នន័យប្រចាំថ្ងៃ</h3>
+        <div class="input-grid">
+            <div class="field"><small>ថ្ងៃខែ</small><input type="date" id="date"></div>
+            <div class="field"><small>ភ្នាក់ងារ</small><input type="text" id="agent" placeholder="ឈ្មោះ"></div>
+            <div class="field"><small>Ads/Gross</small><input type="number" id="gross" oninput="calcTotal()"></div>
+            <div class="field"><small>Sim</small><input type="number" id="sim"></div>
+            <div class="field"><small>TopUp ($)</small><input type="number" id="topup" oninput="calcTotal()"></div>
+            <div class="field"><small>Shop ($)</small><input type="number" id="shop" oninput="calcTotal()"></div>
+            <div class="field"><small>Dealer ($)</small><input type="number" id="dealer" oninput="calcTotal()"></div>
+            <div class="field"><small>សរុប ($)</small><input type="number" id="totalrev" readonly style="background:#f8fafc; font-weight:bold; color: var(--primary);"></div>
         </div>
-        <div class="filter-group">
-            <button class="filter-btn active" onclick="setRange('MOM', this)">M-o-M</button>
-            <button class="filter-btn" onclick="setRange(7, this)">7 ថ្ងៃមុន</button>
-            <button class="filter-btn" onclick="setRange(30, this)">30 ថ្ងៃមុន</button>
-        </div>
+        <button class="btn-save" id="saveBtn" onclick="saveData()">រក្សាទុកទិន្នន័យ</button>
     </div>
 
-    <div class="stats-grid" id="dashboardStats"></div>
-
-    <div id="salesTab">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ថ្ងៃខែ</th>
-                        <th>ភ្នាក់ងារ</th>
-                        <th>Unit (Ads/Sim/Hm/Fb)</th>
-                        <th>Rev (Top/Shop/Dlr)</th>
-                        <th>សរុប $</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="salBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="depositTab" class="hidden">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ថ្ងៃខែ</th>
-                        <th>ភ្នាក់ងារ</th>
-                        <th>Cash ($)</th>
-                        <th>Credit ($)</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="depBody"></tbody>
-            </table>
-        </div>
+    <div class="card" style="overflow-x: auto;">
+        <h3 style="margin-top:0">របាយការណ៍លក់ចុងក្រោយ</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ថ្ងៃខែ</th>
+                    <th>ភ្នាក់ងារ</th>
+                    <th>Gross/Sim</th>
+                    <th>TopUp/Shop/Dlr</th>
+                    <th>សរុប</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    // --- API URL ថ្មីរបស់លោកអ្នក ---
-    const API = "https://script.google.com/macros/s/AKfycbwCvosl2RwgbR6Wb91CpuInO5jG1F-0fkZ3XwWLH5dPFiijAyUYdRIy6u7uk3Yb-ScUgQ/exec";
-    
-    let state = { store: [], range: 'MOM' };
+    const API = "https://script.google.com/macros/s/AKfycbyVmsOGm-20o8qnz0fgATA7vmEO48AbaCHjP0WfUjYp6Y4GUxpEi0TXa5jBH02EWbAFTg/exec";
+    let state = { store: [], editIndex: null };
 
-    // --- Tab Control ---
-    function showTab(tab, btn) {
-        document.getElementById('depositTab').classList.toggle('hidden', tab !== 'deposit');
-        document.getElementById('salesTab').classList.toggle('hidden', tab !== 'sales');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    // Set Default Date to Today
+    document.getElementById('date').valueAsDate = new Date();
+
+    function calcTotal() {
+        const t = parseFloat(document.getElementById('topup').value || 0);
+        const s = parseFloat(document.getElementById('shop').value || 0);
+        const d = parseFloat(document.getElementById('dealer').value || 0);
+        document.getElementById('totalrev').value = (t + s + d).toFixed(2);
     }
 
-    // --- Range Filter Control ---
-    function setRange(range, btn) {
-        state.range = range;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        updateDashboard();
-    }
-
-    // --- ទាញទិន្នន័យពី API ---
     async function loadData() {
-        showMsg("⏳ កំពុងទាញទិន្នន័យ...", "var(--unit)");
+        document.getElementById('statsGrid').innerHTML = "<div class='loader'></div> កំពុងទាញទិន្នន័យ...";
         try {
-            const response = await fetch(API);
-            const data = await response.json();
-            state.store = data;
-            renderTables();
-            updateDashboard();
-            document.getElementById('status').style.display = 'none';
-        } catch (error) {
-            showMsg("❌ មិនអាចភ្ជាប់ទៅកាន់ API បានទេ!", "var(--danger)");
-            console.error(error);
+            const res = await fetch(API);
+            state.store = await res.json();
+            render();
+        } catch (e) { 
+            document.getElementById('statsGrid').innerHTML = "<p style='color:red'>❌ បញ្ហាការតភ្ជាប់ API!</p>";
         }
     }
 
-    // --- បង្ហាញតារាងទិន្នន័យ ---
-    function renderTables() {
-        const sBody = document.getElementById('salBody');
-        const dBody = document.getElementById('depBody');
-        sBody.innerHTML = ""; dBody.innerHTML = "";
-
-        state.store.forEach(item => {
-            const row = `<tr>
-                <td>${item.date || item.Date}</td>
-                <td><b>${item.agent || item.Agent}</b></td>
-                ${item.recordType === 'Deposit' ? 
-                    `<td>$${item.cash}</td><td>$${item.credit}</td>` : 
-                    `<td>${item.gross || item.Gross}/${item.sim || item.Sim}/${item.home || item.Home}/${item.fiber || item.Fiber}</td>
-                     <td>${item.topup || item.Topup}/${item.shop || item.Shop}/${item.dealer || item.Dealer}</td>
-                     <td style="color:var(--primary); font-weight:700;">$${parseFloat(item.totalRev || item.TotalRev).toFixed(2)}</td>`
-                }
-                <td><button class="filter-btn" style="padding:5px 10px">មើល</button></td>
-            </tr>`;
-            
-            if (item.recordType === 'Deposit') dBody.innerHTML += row;
-            else sBody.innerHTML += row;
-        });
-    }
-
-    // --- គណនា Dashboard (M-o-M Logic) ---
-    function updateDashboard() {
+    function render() {
         const now = new Date();
         const tDay = now.getDate();
-        const tMonth = now.getMonth() + 1; // ខែកុម្ភៈ = 2
+        const tMonth = now.getMonth() + 1;
         const tYear = now.getFullYear();
+        const preMonth = tMonth === 1 ? 12 : tMonth - 1;
+        const preYear = tMonth === 1 ? tYear - 1 : tYear;
 
-        let current = { rev: 0, gross: 0, sim: 0 };
-        let previous = { rev: 0, gross: 0, sim: 0 };
-        let label = "";
+        let curV = 0, preV = 0, curG = 0, preG = 0;
+        const body = document.getElementById('tableBody');
+        body.innerHTML = "";
 
-        if (state.range === 'MOM') {
-            const preMonth = tMonth === 1 ? 12 : tMonth - 1;
-            const preYear = tMonth === 1 ? tYear - 1 : tYear;
+        state.store.forEach(i => {
+            const dPart = (i.date || "").split(/[-T/]/);
+            if(dPart.length < 3) return;
+            const iy = parseInt(dPart[0]), im = parseInt(dPart[1]), id = parseInt(dPart[2]);
 
-            current = sumSales(tMonth, tYear, 1, 31); // ខែនេះទាំងអស់
-            previous = sumSales(preMonth, preYear, 1, tDay); // ខែមុន ត្រឹមថ្ងៃដូចគ្នា
-            label = `ធៀបនឹងថ្ងៃទី ១ ដល់ ${tDay} ខែមុន`;
-        } else {
-            const days = parseInt(state.range);
-            const d1_start = new Date(); d1_start.setDate(now.getDate() - days + 1);
-            current = sumByDateRange(d1_start, now);
-            
-            const d2_end = new Date(); d2_end.setDate(d1_start.getDate() - 1);
-            const d2_start = new Date(); d2_start.setDate(d2_end.getDate() - days + 1);
-            previous = sumByDateRange(d2_start, d2_end);
-            label = `${days} ថ្ងៃចុងក្រោយ ធៀបនឹង ${days} ថ្ងៃមុន`;
-        }
+            // Current Month
+            if (im === tMonth && iy === tYear) { 
+                curV += parseFloat(i.totalrev || 0); 
+                curG += parseFloat(i.gross || 0); 
+            }
+            // Previous Month (Same period)
+            if (im === preMonth && iy === preYear && id <= tDay) { 
+                preV += parseFloat(i.totalrev || 0); 
+                preG += parseFloat(i.gross || 0); 
+            }
 
-        // មុខងារជំនួយសម្រាប់បូកសរុប
-        function sumSales(m, y, sd, ed) {
-            let res = { rev: 0, gross: 0, sim: 0 };
-            state.store.forEach(i => {
-                const dateStr = i.date || i.Date;
-                if (!dateStr) return;
-                const p = dateStr.split('-');
-                const iy = parseInt(p[0]), im = parseInt(p[1]), id = parseInt(p[2]);
-                if (im === m && iy === y && id >= sd && id <= ed) {
-                    res.rev += parseFloat(i.totalRev || i.TotalRev || 0);
-                    res.gross += parseFloat(i.gross || i.Gross || 0);
-                    res.sim += parseFloat(i.sim || i.Sim || 0);
-                }
-            });
-            return res;
-        }
+            body.innerHTML += `<tr>
+                <td>${i.date ? i.date.substring(0,10) : '---'}</td>
+                <td><b>${i.agent}</b></td>
+                <td>${i.gross}/${i.sim}</td>
+                <td>${i.topup}/${i.shop}/${i.dealer}</td>
+                <td style="color:var(--primary); font-weight:700">$${parseFloat(i.totalrev || 0).toFixed(2)}</td>
+                <td>
+                    <i class="fa-solid fa-pen-to-square" style="color:var(--secondary); cursor:pointer; margin-right:15px" onclick="editRow(${i.rowindex})"></i>
+                    <i class="fa-solid fa-trash" style="color:var(--danger); cursor:pointer" onclick="deleteRow(${i.rowindex})"></i>
+                </td>
+            </tr>`;
+        });
 
-        function sumByDateRange(s, e) {
-            let res = { rev: 0, gross: 0, sim: 0 };
-            state.store.forEach(i => {
-                const d = new Date(i.date || i.Date);
-                if (d >= s && d <= e) {
-                    res.rev += parseFloat(i.totalRev || i.TotalRev || 0);
-                    res.gross += parseFloat(i.gross || i.Gross || 0);
-                    res.sim += parseFloat(i.sim || i.Sim || 0);
-                }
-            });
-            return res;
-        }
-
-        displayStats(current, previous, label);
+        renderCards(curV, preV, curG, preG, tDay);
     }
 
-    function displayStats(curr, prev, label) {
-        const build = (title, icon, cv, pv, is$ , col) => {
-            const diff = cv - pv;
-            const per = pv > 0 ? ((diff / pv) * 100).toFixed(0) : (cv > 0 ? 100 : 0);
-            const isUp = diff >= 0;
+    function renderCards(cv, pv, cg, pg, day) {
+        const createCard = (title, val, old, is$) => {
+            const diff = val - old;
+            const pct = old > 0 ? ((diff / old) * 100).toFixed(0) : 0;
+            const up = diff >= 0;
             return `
-                <div class="stat-card" style="border-bottom-color:${col}">
-                    <h4><i class="${icon}"></i> ${title}</h4>
-                    <span class="val">${is$?'$':''}${cv.toLocaleString()}</span>
-                    <div class="diff ${isUp?'up':'down'}">
-                        <i class="fa-solid fa-arrow-${isUp?'up':'down'}"></i> 
-                        <b>${isUp?'+':''}${per}%</b>
-                        <small style="color:#999; font-weight:400"> (មុន: ${pv.toLocaleString()})</small>
-                    </div>
+                <div class="stat-card">
+                    <small>${title} (ត្រឹមថ្ងៃទី ${day})</small>
+                    <span class="val">${is$ ? '$' : ''}${val.toLocaleString()}</span>
+                    <span class="${up ? 'badge-up' : 'badge-down'}">
+                        <i class="fa-solid fa-arrow-${up ? 'up' : 'down'}"></i> ${up ? '+' : ''}${pct}%
+                    </span>
+                    <span style="font-size:12px; color:#999; margin-left:5px">ពីមុន: ${old.toLocaleString()}</span>
                 </div>`;
         };
-
-        document.getElementById('rangeLabel').innerText = label;
-        document.getElementById('dashboardStats').innerHTML = 
-            build("ចំណូលសរុប", "fa-solid fa-sack-dollar", curr.rev, prev.rev, true, "var(--primary)") +
-            build("Ads/Gross", "fa-solid fa-tower-broadcast", curr.gross, prev.gross, false, "var(--warning)") +
-            build("Sim Sold", "fa-solid fa-sim-card", curr.sim, prev.sim, false, "var(--unit)");
+        document.getElementById('statsGrid').innerHTML = 
+            createCard("ចំណូលសរុបខែនេះ", cv, pv, true) + 
+            createCard("Gross សរុបខែនេះ", cg, pg, false);
     }
 
-    function showMsg(t, c) {
-        const s = document.getElementById('status');
-        s.style.display = 'block'; s.innerText = t; s.style.background = c.startsWith('var') ? c : `var(--${c})`;
+    async function saveData() {
+        const btn = document.getElementById('saveBtn');
+        const agent = document.getElementById('agent').value;
+        if(!agent) { alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!"); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = "<div class='loader' style='width:15px; height:15px'></div> រក្សាសុីទុក...";
+
+        const payload = {
+            action: state.editIndex ? "UPDATE" : "ADD",
+            rowIndex: state.editIndex,
+            date: document.getElementById('date').value,
+            agent: agent,
+            gross: document.getElementById('gross').value || 0,
+            sim: document.getElementById('sim').value || 0,
+            home: 0, fiber: 0,
+            topup: document.getElementById('topup').value || 0,
+            shop: document.getElementById('shop').value || 0,
+            dealer: document.getElementById('dealer').value || 0,
+            totalrev: document.getElementById('totalrev').value
+        };
+
+        try {
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            state.editIndex = null;
+            document.getElementById('formTitle').innerText = "បញ្ចូលទិន្នន័យប្រចាំថ្ងៃ";
+            document.getElementById('agent').value = "";
+            loadData();
+        } catch (e) { alert("រក្សាទុកបរាជ័យ!"); }
+        btn.disabled = false;
+        btn.innerText = "រក្សាទុកទិន្នន័យ";
     }
 
-    window.onload = loadData;
+    function editRow(idx) {
+        const item = state.store.find(i => i.rowindex === idx);
+        state.editIndex = idx;
+        document.getElementById('formTitle').innerText = "កែសម្រួលទិន្នន័យជួរទី " + idx;
+        document.getElementById('date').value = item.date.substring(0,10);
+        document.getElementById('agent').value = item.agent;
+        document.getElementById('gross').value = item.gross;
+        document.getElementById('sim').value = item.sim;
+        document.getElementById('topup').value = item.topup;
+        document.getElementById('shop').value = item.shop;
+        document.getElementById('dealer').value = item.dealer;
+        calcTotal();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    async function deleteRow(idx) {
+        if(confirm("តើអ្នកច្បាស់ទេថានឹងលុបទិន្នន័យជួរទី " + idx + "?")) {
+            await fetch(API, { method: "POST", body: JSON.stringify({action: "DELETE", rowIndex: idx}) });
+            loadData();
+        }
+    }
+
+    loadData();
 </script>
 </body>
 </html>
