@@ -7,177 +7,174 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <title>ស្មាតសប អ៊េចប្រេស ត្រាំកក់</title>
     <style>
-        :root { 
-            --primary: #219E42; 
-            --accent: #15803d;
-            --danger: #ef4444;
-            --info: #3b82f6;
-            --bg: #f1f5f9;
-            --sidebar-width: 280px;
-        }
-
+        :root { --primary: #219E42; --accent: #15803d; --bg: #f1f5f9; --sidebar-width: 260px; }
         body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); display: flex; color: #1e293b; }
 
         /* Sidebar Styling */
-        .sidebar { width: var(--sidebar-width); background: var(--primary); color: white; height: 100vh; position: fixed; padding: 2rem 1.5rem; box-sizing: border-box; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 100; }
-        .sidebar h2 { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
-        .sidebar p { font-size: 0.85rem; opacity: 0.8; text-align: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 1rem; }
-        
-        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; color: white; text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; transition: 0.3s; cursor: pointer; font-weight: 500; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); transform: translateX(5px); }
-        .nav-link i { width: 20px; font-size: 1.1rem; }
+        .sidebar { width: var(--sidebar-width); background: var(--primary); color: white; height: 100vh; position: fixed; padding: 2rem 1rem; box-sizing: border-box; display: flex; flex-direction: column; }
+        .sidebar h2 { font-size: 1.2rem; text-align: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 1rem; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: white; text-decoration: none; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.2); }
 
         /* Main Content */
-        .main-content { margin-left: var(--sidebar-width); padding: 2rem; width: 100%; box-sizing: border-box; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        
+        .main-content { margin-left: var(--sidebar-width); padding: 2.5rem; width: 100%; box-sizing: border-box; }
+        .section { display: none; }
+        .section.active { display: block; }
+
         /* Stats Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-top: 4px solid var(--primary); }
-        .stat-card small { color: #64748b; font-weight: 600; font-size: 0.8rem; }
-        .stat-card .value { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin: 0.5rem 0; display: block; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .stat-card .val { font-size: 1.8rem; font-weight: 700; color: var(--primary); display: block; margin-top: 5px; }
 
-        /* Form Styling */
-        .card { background: white; padding: 2rem; border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 2rem; }
-        .card h3 { margin-top: 0; font-size: 1.1rem; color: #334155; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.7rem; }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; }
-        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .input-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
-        input { padding: 0.75rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 0.95rem; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(33, 158, 66, 0.1); }
+        /* Form Card */
+        .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        input { padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+        input:focus { border-color: var(--primary); outline: none; }
 
-        .btn-action { background: var(--primary); color: white; border: none; padding: 1rem 2rem; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 1.5rem; font-size: 1rem; transition: 0.3s; }
-        .btn-action:hover { background: var(--accent); box-shadow: 0 10px 15px -3px rgba(33, 158, 66, 0.3); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 1rem; }
 
         /* Table Styling */
-        .table-wrap { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .table-wrap { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 1rem 1.5rem; text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1.5px solid #e2e8f0; }
-        td { padding: 1rem 1.5rem; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; }
-        tr:hover { background: #f8fafc; }
+        th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.8rem; color: #64748b; }
+        td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; }
 
-        .badge-total { background: #dcfce7; color: #166534; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 700; }
-        .btn-edit { color: var(--info); cursor: pointer; font-size: 1.1rem; margin-right: 1rem; }
-        .btn-delete { color: var(--danger); cursor: pointer; font-size: 1.1rem; }
-
-        /* Loading */
-        #loader { display: none; text-align: center; padding: 1rem; font-weight: 600; color: var(--primary); }
+        .loader { display: none; text-align: center; color: var(--primary); font-weight: 700; padding: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>ស្មាតសប អ៊េចប្រេស</h2>
-    <p>សាខា ត្រាំកក់ - ការលក់</p>
-    <div class="nav-link active"><i class="fa-solid fa-house"></i> ដាសបត</div>
-    <div class="nav-link"><i class="fa-solid fa-cart-shopping"></i> ការលក់ប្រចាំថ្ងៃ</div>
-    <div class="nav-link"><i class="fa-solid fa-list"></i> បញ្ជីមុខទំនិញ</div>
-    <div class="nav-link"><i class="fa-solid fa-building-columns"></i> ការដាក់ប្រាក់</div>
-    <div class="nav-link" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> Refresh Data</div>
+    <h2>ស្មាតសប ត្រាំកក់</h2>
+    <div class="nav-link active" onclick="showSection('dashboard', this)"><i class="fa-solid fa-chart-pie"></i> ដាសបត</div>
+    <div class="nav-link" onclick="showSection('sales', this)"><i class="fa-solid fa-cart-plus"></i> ការលក់ប្រចាំថ្ងៃ</div>
+    <div class="nav-link"><i class="fa-solid fa-list-check"></i> បញ្ជីមុខទំនិញ</div>
+    <div class="nav-link"><i class="fa-solid fa-money-bill-transfer"></i> ការដាក់ប្រាក់</div>
 </div>
 
 <div class="main-content">
-    <div class="header">
-        <h1>ការលក់ប្រចាំថ្ងៃ</h1>
-        <div id="date-display" style="font-weight: 600; color: #64748b;"></div>
-    </div>
-
-    <div class="stats-grid" id="statsGrid"></div>
-
-    <div class="card">
-        <h3 id="formHeader"><i class="fa-solid fa-circle-plus"></i> បញ្ចូលទិន្នន័យការលក់</h3>
-        <div class="form-grid">
-            <div class="input-group"><label>កាលបរិច្ឆេទ</label><input type="date" id="date"></div>
-            <div class="input-group"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent" placeholder="បញ្ចូលឈ្មោះ"></div>
-            <div class="input-group"><label>Gross</label><input type="number" id="gross" placeholder="0"></div>
-            <div class="input-group"><label>Sim</label><input type="number" id="sim" placeholder="0"></div>
-            <div class="input-group"><label>TopUp ($)</label><input type="number" id="topup" placeholder="0.00"></div>
-            <div class="input-group"><label>Shop ($)</label><input type="number" id="shop" placeholder="0.00"></div>
-            <div class="input-group"><label>Dealer ($)</label><input type="number" id="dealer" placeholder="0.00"></div>
-            <div class="input-group"><label>សរុបបញ្ចូលដៃ ($)</label><input type="number" id="totalrev" style="border-color: var(--primary); font-weight: bold;" placeholder="0.00"></div>
+    
+    <div id="dashboard" class="section active">
+        <h1>ផ្ទាំងសង្ខេប (Dashboard)</h1>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="table-wrap">
+            <h3 style="padding: 1.5rem 0 0 1.5rem; margin: 0;">ទិន្នន័យលក់ចុងក្រោយ</h3>
+            <table>
+                <thead>
+                    <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>G/S</th><th>សរុប ($)</th></tr>
+                </thead>
+                <tbody id="dashTableBody"></tbody>
+            </table>
         </div>
-        <button class="btn-action" id="submitBtn" onclick="handleSave()">រក្សាទុកទិន្នន័យ</button>
-        <div id="loader"><i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...</div>
     </div>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>ថ្ងៃខែ</th>
-                    <th>ភ្នាក់ងារ</th>
-                    <th>G/S</th>
-                    <th>T/S/D</th>
-                    <th>សរុប ($)</th>
-                    <th>សកម្មភាព</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+    <div id="sales" class="section">
+        <h1>ការលក់ប្រចាំថ្ងៃ (Input Data)</h1>
+        <div class="card">
+            <h3 id="formHeader"><i class="fa-solid fa-plus-circle"></i> បញ្ចូលទិន្នន័យថ្មី</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
+                <div class="input-group"><label>ភ្នាក់ងារ</label><input type="text" id="agent"></div>
+                <div class="input-group"><label>Gross</label><input type="number" id="gross"></div>
+                <div class="input-group"><label>Sim</label><input type="number" id="sim"></div>
+                <div class="input-group"><label>TopUp</label><input type="number" id="topup"></div>
+                <div class="input-group"><label>Shop</label><input type="number" id="shop"></div>
+                <div class="input-group"><label>Dealer</label><input type="number" id="dealer"></div>
+                <div class="input-group"><label>សរុប ($)</label><input type="number" id="totalrev" style="font-weight: bold; border-color: var(--primary);"></div>
+            </div>
+            <button class="btn-save" id="submitBtn" onclick="handleSave()">រក្សាទុកការលក់</button>
+            <div id="loader"><i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...</div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>T/S/D</th><th>សរុប ($)</th><th>សកម្មភាព</th></tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+            </table>
+        </div>
     </div>
+
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzh-7yVCZHwkI1JWSqrqOj0YA1eO_ZDPiy6u4N-RNL7VMruvUb3P-3HpbKLzS8HAnlhmA/exec";
-    let appState = { data: [], editId: null };
+    let appData = [];
+    let editId = null;
 
-    // Initial Load
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('date-display').innerText = new Date().toLocaleDateString('km-KH', { dateStyle: 'full' });
-        loadData();
-    });
-
-    async function loadData() {
-        toggleLoader(true);
-        try {
-            const response = await fetch(API_URL);
-            appState.data = await response.json();
-            renderUI();
-        } catch (err) {
-            alert("មិនអាចទាញទិន្នន័យបានទេ!");
-        }
-        toggleLoader(false);
+    // Switch Sections
+    function showSection(id, el) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
     }
 
-    function renderUI() {
-        const body = document.getElementById('tableBody');
-        body.innerHTML = "";
-        let totalMonth = 0, totalGross = 0;
+    // Initial Load
+    window.onload = () => {
+        document.getElementById('date').valueAsDate = new Date();
+        loadData();
+    };
 
-        [...appState.data].reverse().forEach(row => {
-            totalMonth += parseFloat(row.totalrev || 0);
+    async function loadData() {
+        document.getElementById('loader').style.display = "block";
+        try {
+            const res = await fetch(API_URL);
+            appData = await res.json();
+            renderAll();
+        } catch (e) { alert("Load Failed!"); }
+        document.getElementById('loader').style.display = "none";
+    }
+
+    function renderAll() {
+        const dashBody = document.getElementById('dashTableBody');
+        const salesBody = document.getElementById('salesTableBody');
+        dashBody.innerHTML = ""; salesBody.innerHTML = "";
+        
+        let totalRev = 0, totalGross = 0;
+
+        [...appData].reverse().forEach(row => {
+            totalRev += parseFloat(row.totalrev || 0);
             totalGross += parseFloat(row.gross || 0);
 
-            body.innerHTML += `
-                <tr>
-                    <td>${row.date ? row.date.split('T')[0] : ''}</td>
-                    <td><strong>${row.agent}</strong></td>
-                    <td>${row.gross} / ${row.sim}</td>
-                    <td>${row.topup} / ${row.shop} / ${row.dealer}</td>
-                    <td><span class="badge-total">$${parseFloat(row.totalrev || 0).toFixed(2)}</span></td>
-                    <td>
-                        <i class="fa-solid fa-pen-to-square btn-edit" onclick="editEntry(${row.rowindex})"></i>
-                        <i class="fa-solid fa-trash btn-delete" onclick="deleteEntry(${row.rowindex})"></i>
-                    </td>
-                </tr>`;
+            // Render Dashboard Table (Simple)
+            dashBody.innerHTML += `<tr>
+                <td>${row.date.split('T')[0]}</td>
+                <td>${row.agent}</td>
+                <td>${row.gross}/${row.sim}</td>
+                <td><strong>$${parseFloat(row.totalrev).toFixed(2)}</strong></td>
+            </tr>`;
+
+            // Render Sales Table (Full + Action)
+            salesBody.innerHTML += `<tr>
+                <td>${row.date.split('T')[0]}</td>
+                <td>${row.agent}</td>
+                <td>${row.topup}/${row.shop}/${row.dealer}</td>
+                <td><strong>$${parseFloat(row.totalrev).toFixed(2)}</strong></td>
+                <td>
+                    <i class="fa-solid fa-edit" style="color:blue; cursor:pointer;" onclick="editRow(${row.rowindex})"></i> | 
+                    <i class="fa-solid fa-trash" style="color:red; cursor:pointer;" onclick="deleteRow(${row.rowindex})"></i>
+                </td>
+            </tr>`;
         });
 
         document.getElementById('statsGrid').innerHTML = `
-            <div class="stat-card"><small>ចំណូលសរុបខែនេះ</small><span class="value">$${totalMonth.toLocaleString()}</span></div>
-            <div class="stat-card"><small>Gross សរុបខែនេះ</small><span class="value">${totalGross.toLocaleString()}</span></div>
+            <div class="stat-card"><small>ចំណូលសរុបខែនេះ</small><span class="val">$${totalRev.toLocaleString()}</span></div>
+            <div class="stat-card"><small>Gross សរុបខែនេះ</small><span class="val">${totalGross.toLocaleString()}</span></div>
         `;
     }
 
     async function handleSave() {
         const agent = document.getElementById('agent').value;
-        if (!agent) return alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
+        if(!agent) return alert("បញ្ចូលឈ្មោះភ្នាក់ងារ!");
 
-        toggleLoader(true);
+        document.getElementById('loader').style.display = "block";
         const payload = {
-            action: appState.editId ? "UPDATE" : "ADD",
-            rowIndex: appState.editId,
+            action: editId ? "UPDATE" : "ADD",
+            rowIndex: editId,
             date: document.getElementById('date').value,
             agent: agent,
             gross: document.getElementById('gross').value || 0,
@@ -188,22 +185,17 @@
             totalrev: document.getElementById('totalrev').value || 0
         };
 
-        try {
-            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-            resetForm();
-            await loadData();
-        } catch (err) {
-            alert("រក្សាទុកបរាជ័យ!");
-        }
-        toggleLoader(false);
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+        editId = null;
+        document.getElementById('formHeader').innerText = "បញ្ចូលទិន្នន័យថ្មី";
+        resetForm();
+        loadData();
     }
 
-    function editEntry(id) {
-        const item = appState.data.find(i => i.rowindex === id);
-        appState.editId = id;
-        document.getElementById('formHeader').innerHTML = `<i class="fa-solid fa-edit"></i> កែសម្រួលជួរទី ${id}`;
-        document.getElementById('submitBtn').innerText = "ធ្វើបច្ចុប្បន្នភាព";
-        
+    function editRow(id) {
+        const item = appData.find(i => i.rowindex === id);
+        editId = id;
+        document.getElementById('formHeader').innerText = "កែសម្រួលជួរទី " + id;
         document.getElementById('date').value = item.date.split('T')[0];
         document.getElementById('agent').value = item.agent;
         document.getElementById('gross').value = item.gross;
@@ -215,28 +207,16 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function deleteEntry(id) {
-        if (!confirm(`តើអ្នកច្បាស់ទេថានឹងលុបទិន្នន័យជួរទី ${id}?`)) return;
-        toggleLoader(true);
-        try {
-            await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "DELETE", rowIndex: id }) });
-            await loadData();
-        } catch (err) { alert("លុបមិនបានសម្រេច!"); }
-        toggleLoader(false);
+    async function deleteRow(id) {
+        if(!confirm("លុបជួរទី " + id + "?")) return;
+        document.getElementById('loader').style.display = "block";
+        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "DELETE", rowIndex: id }) });
+        loadData();
     }
 
     function resetForm() {
-        appState.editId = null;
-        document.getElementById('formHeader').innerHTML = `<i class="fa-solid fa-circle-plus"></i> បញ្ចូលទិន្នន័យការលក់`;
-        document.getElementById('submitBtn').innerText = "រក្សាទុកទិន្នន័យ";
-        document.querySelectorAll('input').forEach(inp => inp.id !== 'date' ? inp.value = "" : null);
-    }
-
-    function toggleLoader(show) {
-        document.getElementById('loader').style.display = show ? 'block' : 'none';
-        document.getElementById('submitBtn').style.display = show ? 'none' : 'block';
+        document.querySelectorAll('input').forEach(i => i.id !== 'date' ? i.value = "" : null);
     }
 </script>
-
 </body>
 </html>
