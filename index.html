@@ -5,113 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Smart Shop Tram Kak</title>
+    <title>Smart Shop Tram Kak - Full System</title>
     <style>
-        :root { --primary: #219E42; --bg: #f1f5f9; }
-        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 900px; border-top: 5px solid var(--primary); }
-        .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .group-label { grid-column: 1 / -1; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; margin: 10px 0; background: #f8fafc; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
+        :root { --primary: #219E42; --bg: #f1f5f9; --sidebar: #1e293b; }
+        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); display: flex; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 260px; background: var(--sidebar); color: white; height: 100vh; position: fixed; padding: 1.5rem 1rem; }
+        .sidebar h2 { color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-bottom: 5px; color: #cbd5e1; }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item:hover:not(.active) { background: #334155; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 2.5rem; width: 100%; }
+        .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); }
+        
+        /* Form Layout */
+        .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .group-label { grid-column: 1 / -1; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding: 5px 12px; background: #f8fafc; margin: 10px 0; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
-        input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; font-size: 1rem; margin-top: 10px; }
-        .table-wrap { width: 100%; max-width: 900px; margin-top: 30px; background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        #loader { display: none; margin-top: 10px; color: var(--primary); font-weight: bold; }
+        input { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-family: inherit; transition: 0.2s; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(33, 158, 66, 0.1); }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-family: inherit; transition: 0.3s; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-save:hover { background: #1a7d34; transform: translateY(-2px); }
+        .btn-cancel { background: #e2e8f0; color: #64748b; }
+
+        /* Table Styles */
+        .table-wrap { margin-top: 2.5rem; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #f8fafc; font-size: 0.9rem; }
+        .badge-rev { background: #f0fdf4; color: #166534; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
+        
+        #loader { display: none; text-align: center; padding: 10px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 style="margin-top:0; color:#1e293b;"><i class="fa-solid fa-cash-register"></i> បញ្ចូលទិន្នន័យការលក់</h2>
-    <div class="input-row">
-        <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
-        <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent"></div>
-    </div>
-    <div class="group-label">ចំនួនលក់ (Units)</div>
-    <div class="input-row">
-        <div class="field"><label>Gross-Ads</label><input type="number" id="gross" value="0"></div>
-        <div class="field"><label>Change-SIM</label><input type="number" id="sim" value="0"></div>
-        <div class="field"><label>S@Home</label><input type="number" id="home" value="0"></div>
-        <div class="field"><label>Fiber+</label><input type="number" id="fiber" value="0"></div>
-    </div>
-    <div class="group-label">ទឹកប្រាក់ (Currency $)</div>
-    <div class="input-row">
-        <div class="field"><label>Recharge</label><input type="number" id="recharge" value="0.00" step="0.01"></div>
-        <div class="field"><label>SC-Shop</label><input type="number" id="shop" value="0.00" step="0.01"></div>
-        <div class="field"><label>SC-Dealer</label><input type="number" id="dealer" value="0.00" step="0.01"></div>
-        <div class="field"><label>Total Revenue</label><input type="number" id="totalrev" value="0.00" step="0.01" style="font-weight:bold; border:2px solid var(--primary)"></div>
-    </div>
-    <button class="btn-save" id="btnSubmit" onclick="handleSave()">រក្សាទុកទិន្នន័យ</button>
-    <div id="loader">កំពុងដំណើរការ...</div>
+<div class="sidebar">
+    <h2>SMART TRAM KAK</h2>
+    <div class="nav-item active"><i class="fa-solid fa-cash-register"></i> ការលក់ប្រចាំថ្ងៃ</div>
+    <div class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> របាយការណ៍</div>
 </div>
 
-<div class="table-wrap">
-    <table>
-        <thead>
-            <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>Units (A/S/H/F)</th><th>Currency (R/S/D)</th><th>សរុប ($)</th><th>Action</th></tr>
-        </thead>
-        <tbody id="salesBody"></tbody>
-    </table>
+<div class="main-content">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 id="formTitle" style="margin:0"><i class="fa-solid fa-plus-circle"></i> បញ្ចូលទិន្នន័យថ្មី</h3>
+            <div id="loader"><i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...</div>
+        </div>
+
+        <div class="input-row">
+            <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
+            <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent" placeholder="បញ្ចូលឈ្មោះ"></div>
+        </div>
+
+        <div class="group-label">Unit Group (ចំនួនលក់)</div>
+        <div class="input-row">
+            <div class="field"><label>Gross-Ads</label><input type="number" id="gross" value="0"></div>
+            <div class="field"><label>Change-SIM</label><input type="number" id="sim" value="0"></div>
+            <div class="field"><label>S@Home</label><input type="number" id="home" value="0"></div>
+            <div class="field"><label>Fiber+</label><input type="number" id="fiber" value="0"></div>
+        </div>
+
+        <div class="group-label">Currency Group (ទឹកប្រាក់ $)</div>
+        <div class="input-row">
+            <div class="field"><label>Recharge</label><input type="number" id="recharge" value="0.00" step="0.01"></div>
+            <div class="field"><label>SC-Shop</label><input type="number" id="shop" value="0.00" step="0.01"></div>
+            <div class="field"><label>SC-Dealer</label><input type="number" id="dealer" value="0.00" step="0.01"></div>
+            <div class="field"><label style="color:var(--primary)">Total Revenue</label><input type="number" id="totalrev" value="0.00" step="0.01" style="border: 2px solid var(--primary); font-weight: bold;"></div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-save" id="btnSave" onclick="handleSave()">រក្សាទុកទិន្នន័យ</button>
+            <button class="btn btn-cancel" onclick="resetForm()">សម្អាត</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>A / S / H / F</th><th>R / S / D ($)</th><th>សរុប ($)</th><th>សកម្មភាព</th>
+                </tr>
+            </thead>
+            <tbody id="salesBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     const API = "https://script.google.com/macros/s/AKfycbw9tLKhNeeIdJ0HNwR3441CkpVf6c6GVG0-W6EjAy12_JNGUsd0gze-oRRm8kFVD82KyA/exec";
     let editIdx = null;
+    let dataStore = [];
 
-    window.onload = () => { document.getElementById('date').valueAsDate = new Date(); loadData(); };
+    window.onload = () => {
+        document.getElementById('date').valueAsDate = new Date();
+        loadData();
+    };
 
     async function loadData() {
-        document.getElementById('loader').style.display = "block";
+        showLoader(true);
         try {
             const res = await fetch(API);
-            const store = await res.json();
-            const body = document.getElementById('salesBody');
-            body.innerHTML = "";
-            store.sort((a,b) => new Date(b.Date) - new Date(a.Date)).forEach(row => {
-                body.innerHTML += `<tr>
-                    <td>${row.Date ? row.Date.split('T')[0] : ''}</td>
-                    <td><b>${row.Agent || ''}</b></td>
-                    <td>${row["Gross-Ads"]}/${row["Change-SIM"]}/${row["S@Home"]}/${row["Fiber+"]}</td>
-                    <td>$${parseFloat(row.Recharge || 0).toFixed(2)} / $${parseFloat(row["SC-Shop"] || 0).toFixed(2)} / $${parseFloat(row["SC-Dealer"] || 0).toFixed(2)}</td>
-                    <td style="color:green; font-weight:bold;">$${parseFloat(row.TotalRev || 0).toFixed(2)}</td>
-                    <td><i class="fa-solid fa-edit" style="color:blue; cursor:pointer" onclick="editRow(${JSON.stringify(row).replace(/"/g, '&quot;')})"></i></td>
-                </tr>`;
-            });
-        } catch (e) { console.error("Error:", e); }
-        document.getElementById('loader').style.display = "none";
+            dataStore = await res.json();
+            renderTable();
+        } catch (e) { alert("មិនអាចទាញទិន្នន័យបាន!"); }
+        showLoader(false);
+    }
+
+    function renderTable() {
+        const body = document.getElementById('salesBody');
+        body.innerHTML = "";
+        dataStore.sort((a, b) => new Date(b.Date) - new Date(a.Date)).forEach(row => {
+            const date = row.Date ? row.Date.split('T')[0] : '---';
+            const units = `${row["Gross-Ads"] || 0} / ${row["Change-SIM"] || 0} / ${row["S@Home"] || 0} / ${row["Fiber+"] || 0}`;
+            const currency = `$${parseFloat(row.Recharge || 0).toFixed(2)} / $${parseFloat(row["SC-Shop"] || 0).toFixed(2)} / $${parseFloat(row["SC-Dealer"] || 0).toFixed(2)}`;
+            
+            body.innerHTML += `<tr>
+                <td>${date}</td>
+                <td><b>${row.Agent || ''}</b></td>
+                <td>${units}</td>
+                <td>${currency}</td>
+                <td><span class="badge-rev">$${parseFloat(row.TotalRev || 0).toFixed(2)}</span></td>
+                <td>
+                    <button onclick='editRow(${JSON.stringify(row)})' style="border:none; background:none; color:blue; cursor:pointer; margin-right:10px;"><i class="fa-solid fa-edit"></i></button>
+                    <button onclick="deleteRow(${row.rowindex})" style="border:none; background:none; color:red; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>`;
+        });
     }
 
     async function handleSave() {
-        if (!document.getElementById('agent').value) return alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
-        document.getElementById('loader').style.display = "block";
+        if(!document.getElementById('agent').value) return alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
+        showLoader(true);
+
         const payload = {
-            action: editIdx ? "UPDATE" : "ADD", rowIndex: editIdx,
-            Date: document.getElementById('date').value, Agent: document.getElementById('agent').value,
-            GrossAds: document.getElementById('gross').value, ChangeSIM: document.getElementById('sim').value,
-            SmartHome: document.getElementById('home').value, Fiber: document.getElementById('fiber').value,
-            Recharge: document.getElementById('recharge').value, SCShop: document.getElementById('shop').value,
-            SCDealer: document.getElementById('dealer').value, TotalRev: document.getElementById('totalrev').value
+            action: editIdx ? "UPDATE" : "ADD",
+            rowIndex: editIdx,
+            Date: document.getElementById('date').value,
+            Agent: document.getElementById('agent').value,
+            GrossAds: document.getElementById('gross').value,
+            ChangeSIM: document.getElementById('sim').value,
+            SmartHome: document.getElementById('home').value,
+            Fiber: document.getElementById('fiber').value,
+            Recharge: document.getElementById('recharge').value,
+            SCShop: document.getElementById('shop').value,
+            SCDealer: document.getElementById('dealer').value,
+            TotalRev: document.getElementById('totalrev').value
         };
-        
-        await fetch(API, { method: "POST", mode: 'no-cors', body: JSON.stringify(payload) });
-        
-        // ដោយសារប្រើ no-cors យើងមិនអាចដឹងថា success ឬអត់ភ្លាមៗទេ ដូច្នេះយើងត្រូវរង់ចាំ ២ វិនាទី រួច refresh
-        setTimeout(() => {
+
+        try {
+            // ប្រើការផ្ញើបែប POST ពេញលេញ
+            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
             editIdx = null;
-            document.querySelectorAll('input[type="number"]').forEach(i => i.value = "0");
-            document.getElementById('agent').value = "";
-            document.getElementById('btnSubmit').innerText = "រក្សាទុកទិន្នន័យ";
-            loadData();
-        }, 2000);
+            resetForm();
+            await loadData(); // Refresh table
+        } catch (e) { alert("ការបញ្ជូនទិន្នន័យមានបញ្ហា!"); }
+        showLoader(false);
     }
 
     function editRow(row) {
         editIdx = row.rowindex;
-        document.getElementById('btnSubmit').innerText = "ធ្វើបច្ចុប្បន្នភាព";
+        document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-edit"></i> កំពុងកែសម្រួលជួរទី ${editIdx}`;
+        document.getElementById('btnSave').innerText = "ធ្វើបច្ចុប្បន្នភាព";
+        
         document.getElementById('date').value = row.Date.split('T')[0];
         document.getElementById('agent').value = row.Agent;
         document.getElementById('gross').value = row["Gross-Ads"];
@@ -123,6 +186,27 @@
         document.getElementById('dealer').value = row["SC-Dealer"];
         document.getElementById('totalrev').value = row.TotalRev;
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteRow(id) {
+        if(!confirm("តើអ្នកចង់លុបទិន្នន័យនេះមែនទេ?")) return;
+        showLoader(true);
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "DELETE", rowIndex: id }) });
+        await loadData();
+        showLoader(false);
+    }
+
+    function resetForm() {
+        editIdx = null;
+        document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> បញ្ចូលទិន្នន័យថ្មី`;
+        document.getElementById('btnSave').innerText = "រក្សាទុកទិន្នន័យ";
+        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "0");
+        document.getElementById('agent').value = "";
+    }
+
+    function showLoader(show) {
+        document.getElementById('loader').style.display = show ? "block" : "none";
+        document.getElementById('btnSave').disabled = show;
     }
 </script>
 </body>
