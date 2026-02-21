@@ -5,99 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>ស្មាតសប ត្រាំកក់ - ការលក់</title>
+    <title>ស្មាតសប ត្រាំកក់ - ការលក់ប្រចាំថ្ងៃ</title>
     <style>
         :root { --primary: #219E42; --bg: #f1f5f9; --sidebar-width: 250px; }
         body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); display: flex; }
-        
-        /* Sidebar */
         .sidebar { width: var(--sidebar-width); background: var(--primary); color: white; height: 100vh; position: fixed; padding: 1rem; box-sizing: border-box; }
-        .nav-link { display: flex; align-items: center; gap: 10px; padding: 12px; color: white; text-decoration: none; border-radius: 8px; cursor: pointer; margin-bottom: 5px; transition: 0.3s; }
-        .nav-link.active { background: rgba(255,255,255,0.2); font-weight: bold; }
-        .nav-link:hover { background: rgba(255,255,255,0.1); }
-
-        /* Main Content */
         .main-content { margin-left: var(--sidebar-width); padding: 2rem; width: 100%; box-sizing: border-box; }
-        
-        /* Form Card */
         .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); }
         .form-title { margin-bottom: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: #1e293b; background: #f0fdf4; padding: 12px; border-radius: 10px; }
-        
         .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .group-label { grid-column: 1 / -1; font-size: 0.85rem; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; margin: 10px 0; background: #f8fafc; padding-top: 5px; padding-bottom: 5px; }
-        
+        .group-label { grid-column: 1 / -1; font-size: 0.85rem; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; margin: 10px 0; background: #f8fafc; padding: 5px 10px; }
         .field { display: flex; flex-direction: column; gap: 5px; }
         .field label { font-size: 0.8rem; font-weight: 600; color: #64748b; }
         input { padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 0.9rem; }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(33, 158, 66, 0.1); }
-
         .btn-save { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; font-size: 1rem; margin-top: 10px; transition: 0.3s; }
-        .btn-save:hover { background: #1a7d34; transform: translateY(-1px); }
-        .btn-save:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        /* Table */
+        .btn-save:hover { background: #1a7d34; }
         .table-wrap { margin-top: 2rem; background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.75rem; color: #64748b; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
+        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.75rem; color: #64748b; border-bottom: 1px solid #e2e8f0; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-        
         .unit-cell { color: #64748b; font-weight: 600; }
         .currency-cell { color: #166534; font-weight: 700; }
-        
-        #loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; font-size: 0.9rem; }
+        #loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="text-align:center; margin-bottom: 2rem;">Smart Shop</h2>
-    <div class="nav-link active"><i class="fa-solid fa-cash-register"></i> ការលក់ប្រចាំថ្ងៃ</div>
-    <div class="nav-link"><i class="fa-solid fa-chart-line"></i> របាយការណ៍</div>
+    <h2 style="text-align:center">Smart Shop</h2>
+    <div style="padding: 12px; background: rgba(255,255,255,0.2); border-radius: 8px;"><i class="fa-solid fa-cash-register"></i> ការលក់ប្រចាំថ្ងៃ</div>
 </div>
 
 <div class="main-content">
     <div class="card">
-        <div class="form-title" id="formHeader">
-            <i class="fa-solid fa-circle-info"></i> 
-            <span>សូមបញ្ចូលទិន្ន័យការលក់ប្រចាំថ្ងៃរបស់អ្នកអោយបានត្រឹមត្រូវ</span>
-        </div>
-        
+        <div class="form-title" id="formHeader"><i class="fa-solid fa-circle-info"></i> <span>បញ្ចូលទិន្ន័យការលក់</span></div>
         <div class="input-row">
             <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
-            <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent" placeholder="បញ្ចូលឈ្មោះអ្នកលក់"></div>
+            <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent"></div>
         </div>
-
         <div class="input-row">
-            <div class="group-label">Unit Group (ចំនួន)</div>
+            <div class="group-label">Unit Group (A/S/H/F)</div>
             <div class="field"><label>Gross Ads</label><input type="number" id="gross" value="0"></div>
             <div class="field"><label>Change SIM</label><input type="number" id="sim" value="0"></div>
-            <div class="field"><label>Smart@Home</label><input type="number" id="home" value="0"></div>
-            <div class="field"><label>Smart Fiber+</label><input type="number" id="fiber" value="0"></div>
+            <div class="field"><label>S@Home</label><input type="number" id="home" value="0"></div>
+            <div class="field"><label>Fiber+</label><input type="number" id="fiber" value="0"></div>
         </div>
-
         <div class="input-row">
             <div class="group-label">Currency Group ($)</div>
-            <div class="field"><label>Recharge ($)</label><input type="number" id="recharge" value="0.00" step="0.01"></div>
-            <div class="field"><label>SC Shop ($)</label><input type="number" id="shop" value="0.00" step="0.01"></div>
-            <div class="field"><label>SC Dealer ($)</label><input type="number" id="dealer" value="0.00" step="0.01"></div>
-            <div class="field"><label style="color:var(--primary)">Revenue ($)</label><input type="number" id="totalrev" value="0.00" step="0.01" style="border: 2px solid var(--primary); font-weight:bold"></div>
+            <div class="field"><label>Recharge</label><input type="number" id="recharge" value="0.00" step="0.01"></div>
+            <div class="field"><label>SC-Shop</label><input type="number" id="shop" value="0.00" step="0.01"></div>
+            <div class="field"><label>SC-Dealer</label><input type="number" id="dealer" value="0.00" step="0.01"></div>
+            <div class="field"><label style="color:var(--primary)">Total Revenue</label><input type="number" id="totalrev" value="0.00" step="0.01" style="border:2px solid var(--primary); font-weight:bold"></div>
         </div>
-
         <button class="btn-save" id="btnSubmit" onclick="handleSave()">រក្សាទុកទិន្នន័យ</button>
-        <div id="loader"><i class="fa-solid fa-sync fa-spin"></i> កំពុងដំណើរការ... សូមរង់ចាំមួយភ្លែត</div>
+        <div id="loader"><i class="fa-solid fa-sync fa-spin"></i> កំពុងដំណើរការ...</div>
     </div>
 
     <div class="table-wrap">
         <table>
             <thead>
-                <tr>
-                    <th>ថ្ងៃខែ</th>
-                    <th>ភ្នាក់ងារ</th>
-                    <th>Units (A/S/H/F)</th>
-                    <th>Currency (R/S/D)</th>
-                    <th>Revenue ($)</th>
-                    <th>សកម្មភាព</th>
-                </tr>
+                <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>Units (A/S/H/F)</th><th>Currency (R/S/D)</th><th>TotalRev</th><th>សកម្មភាព</th></tr>
             </thead>
             <tbody id="salesBody"></tbody>
         </table>
@@ -105,155 +72,83 @@
 </div>
 
 <script>
-    // URL ថ្មីដែលលោកអ្នកបានផ្ដល់ឱ្យ
-    const API = "https://script.google.com/macros/s/AKfycbzb6Fxl6fUPnAEdWZZVIpUVCKCiCbpiTiLt8UigH28eOyLFxtSj679bfxFwb07h_o9mjw/exec"; 
+    const API = "https://script.google.com/macros/s/AKfycbw9tLKhNeeIdJ0HNwR3441CkpVf6c6GVG0-W6EjAy12_JNGUsd0gze-oRRm8kFVD82KyA/exec"; 
     let store = [];
     let editIdx = null;
 
-    window.onload = () => {
-        document.getElementById('date').valueAsDate = new Date();
-        loadData();
-    };
+    window.onload = () => { document.getElementById('date').valueAsDate = new Date(); loadData(); };
 
-    // ទាញទិន្នន័យពី Google Sheets
     async function loadData() {
         document.getElementById('loader').style.display = "block";
         try {
-            const response = await fetch(API);
-            store = await response.json();
+            const res = await fetch(API);
+            store = await res.json();
             render();
-        } catch (e) { 
-            console.error("Load failed", e);
-        }
+        } catch (e) { console.error(e); }
         document.getElementById('loader').style.display = "none";
     }
 
-    // បង្ហាញទិន្នន័យក្នុងតារាង
     function render() {
         const body = document.getElementById('salesBody');
         body.innerHTML = "";
-        
-        // តម្រៀបតាមថ្ងៃខែ (ថ្មីបំផុតនៅខាងលើ)
-        const sorted = [...store].sort((a, b) => new Date(b.date) - new Date(a.date));
-
+        const sorted = [...store].sort((a, b) => new Date(b.Date) - new Date(a.Date));
         sorted.forEach(row => {
-            const d = row.date ? row.date.split('T')[0] : '---';
-            const units = `${row.gross || 0} / ${row.sim || 0} / ${row.home || 0} / ${row.fiber || 0}`;
-            
-            // បង្ហាញទិន្នន័យ Recharge, SC Shop, SC Dealer
-            const r = parseFloat(row.recharge || 0).toFixed(2);
-            const sh = parseFloat(row.shop || 0).toFixed(2);
-            const de = parseFloat(row.dealer || 0).toFixed(2);
-            const rev = parseFloat(row.totalrev || 0).toFixed(2);
-            
+            const d = row.Date ? row.Date.split('T')[0] : '---';
+            const units = `${row["Gross-Ads"] || 0}/${row["Change-SIM"] || 0}/${row["S@Home"] || 0}/${row["Fiber+"] || 0}`;
+            const currency = `$${parseFloat(row.Recharge || 0).toFixed(2)} / $${parseFloat(row["SC-Shop"] || 0).toFixed(2)} / $${parseFloat(row["SC-Dealer"] || 0).toFixed(2)}`;
             body.innerHTML += `<tr>
-                <td style="font-weight:600">${d}</td>
-                <td><b>${row.agent || ''}</b></td>
-                <td class="unit-cell">${units}</td>
-                <td class="currency-cell">$${r} / $${sh} / $${de}</td>
-                <td class="currency-cell" style="background:#f0fdf4; color:#166534;">$${rev}</td>
+                <td>${d}</td><td><b>${row.Agent || ''}</b></td>
+                <td class="unit-cell">${units}</td><td class="currency-cell">${currency}</td>
+                <td class="currency-cell" style="background:#f0fdf4">$${parseFloat(row.TotalRev || 0).toFixed(2)}</td>
                 <td>
-                    <i class="fa-solid fa-edit" style="color:#3b82f6; cursor:pointer; margin-right:15px; font-size:1.1rem;" onclick="editRow(${row.rowindex})"></i>
-                    <i class="fa-solid fa-trash" style="color:#ef4444; cursor:pointer; font-size:1.1rem;" onclick="deleteRow(${row.rowindex})"></i>
-                </td>
-            </tr>`;
+                    <i class="fa-solid fa-edit" style="color:blue; cursor:pointer; margin-right:12px" onclick="editRow(${row.rowindex})"></i>
+                    <i class="fa-solid fa-trash" style="color:red; cursor:pointer" onclick="deleteRow(${row.rowindex})"></i>
+                </td></tr>`;
         });
     }
 
-    // មុខងារ រក្សាទុក និង ធ្វើបច្ចុប្បន្នភាព
     async function handleSave() {
-        const agentValue = document.getElementById('agent').value;
-        if (!agentValue) {
-            alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
-            return;
-        }
-
-        const btn = document.getElementById('btnSubmit');
-        const loader = document.getElementById('loader');
-        
-        btn.disabled = true;
-        loader.style.display = "block";
-
+        if (!document.getElementById('agent').value) return alert("បញ្ចូលឈ្មោះភ្នាក់ងារ!");
+        document.getElementById('loader').style.display = "block";
         const payload = {
-            action: editIdx ? "UPDATE" : "ADD",
-            rowIndex: editIdx,
-            date: document.getElementById('date').value,
-            agent: agentValue,
-            gross: document.getElementById('gross').value,
-            sim: document.getElementById('sim').value,
-            home: document.getElementById('home').value,
-            fiber: document.getElementById('fiber').value,
-            recharge: document.getElementById('recharge').value,
-            shop: document.getElementById('shop').value,
-            dealer: document.getElementById('dealer').value,
-            totalrev: document.getElementById('totalrev').value
+            action: editIdx ? "UPDATE" : "ADD", rowIndex: editIdx,
+            Date: document.getElementById('date').value, Agent: document.getElementById('agent').value,
+            GrossAds: document.getElementById('gross').value, ChangeSIM: document.getElementById('sim').value,
+            SmartHome: document.getElementById('home').value, Fiber: document.getElementById('fiber').value,
+            Recharge: document.getElementById('recharge').value, SCShop: document.getElementById('shop').value,
+            SCDealer: document.getElementById('dealer').value, TotalRev: document.getElementById('totalrev').value
         };
-
-        try {
-            const response = await fetch(API, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-            
-            if (response.ok) {
-                editIdx = null;
-                resetForm();
-                await loadData(); // ទាញទិន្នន័យថ្មីមកបង្ហាញភ្លាមៗ
-            } else {
-                alert("ការរក្សាទុកមិនជោគជ័យ!");
-            }
-        } catch (e) { 
-            alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅកាន់ Server!");
-        }
-
-        btn.disabled = false;
-        loader.style.display = "none";
+        await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+        editIdx = null; resetForm(); await loadData();
     }
 
-    // មុខងារ កែសម្រួល (Edit)
     function editRow(id) {
-        const item = store.find(i => i.rowindex === id);
-        if (!item) return;
-
+        const it = store.find(i => i.rowindex === id);
         editIdx = id;
-        document.getElementById('formHeader').innerHTML = `<i class="fa-solid fa-edit" style="color:#3b82f6"></i> <span>កំពុងកែសម្រួលទិន្នន័យជួរទី ${id}</span>`;
-        document.getElementById('btnSubmit').innerText = "ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ";
-        
-        document.getElementById('date').value = item.date ? item.date.split('T')[0] : '';
-        document.getElementById('agent').value = item.agent || "";
-        document.getElementById('gross').value = item.gross || 0;
-        document.getElementById('sim').value = item.sim || 0;
-        document.getElementById('home').value = item.home || 0;
-        document.getElementById('fiber').value = item.fiber || 0;
-        document.getElementById('recharge').value = item.recharge || 0;
-        document.getElementById('shop').value = item.shop || 0;
-        document.getElementById('dealer').value = item.dealer || 0;
-        document.getElementById('totalrev').value = item.totalrev || 0;
-
+        document.getElementById('btnSubmit').innerText = "ធ្វើបច្ចុប្បន្នភាព";
+        document.getElementById('date').value = it.Date.split('T')[0];
+        document.getElementById('agent').value = it.Agent;
+        document.getElementById('gross').value = it["Gross-Ads"];
+        document.getElementById('sim').value = it["Change-SIM"];
+        document.getElementById('home').value = it["S@Home"];
+        document.getElementById('fiber').value = it["Fiber+"];
+        document.getElementById('recharge').value = it.Recharge;
+        document.getElementById('shop').value = it["SC-Shop"];
+        document.getElementById('dealer').value = it["SC-Dealer"];
+        document.getElementById('totalrev').value = it.TotalRev;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // មុខងារ លុប (Delete)
     async function deleteRow(id) {
-        if (!confirm("តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះមែនទេ?")) return;
-        
+        if (!confirm("លុបទិន្នន័យ?")) return;
         document.getElementById('loader').style.display = "block";
-        try {
-            await fetch(API, { 
-                method: "POST", 
-                body: JSON.stringify({ action: "DELETE", rowIndex: id }) 
-            });
-            await loadData();
-        } catch (e) {
-            alert("ការលុបមិនបានសម្រេច!");
-        }
+        await fetch(API, { method: "POST", body: JSON.stringify({ action: "DELETE", rowIndex: id }) });
+        await loadData();
     }
 
-    // សម្អាត Form
     function resetForm() {
         document.querySelectorAll('input[type="number"]').forEach(i => i.value = "0");
         document.getElementById('agent').value = "";
-        document.getElementById('formHeader').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>សូមបញ្ចូលទិន្ន័យការលក់ប្រចាំថ្ងៃរបស់អ្នកអោយបានត្រឹមត្រូវ</span>`;
         document.getElementById('btnSubmit').innerText = "រក្សាទុកទិន្នន័យ";
     }
 </script>
