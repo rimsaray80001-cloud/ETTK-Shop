@@ -62,6 +62,7 @@ window.addEventListener('load', function() {
         document.getElementById('branch_name').value = userData.branch;
         
         loadDataFromStorage();
+        checkUserPermissions();
         showPage('dashboard');
     }
 });
@@ -106,6 +107,7 @@ document.getElementById('loginFormPopup').addEventListener('submit', function(e)
             document.getElementById('branch_name').value = user.branch;
             
             loadDataFromStorage();
+            checkUserPermissions();
             showPage('dashboard');
         } else {
             document.getElementById('loginError').classList.add('show');
@@ -157,9 +159,20 @@ function showPage(page) {
     } else if (page === 'customers') {
         document.getElementById('customers-page').classList.remove('hidden');
         document.getElementById('menu-customers').classList.add('active');
+        checkExpiringCustomers();
     } else if (page === 'settings') {
         document.getElementById('settings-page').classList.remove('hidden');
         document.getElementById('menu-settings').classList.add('active');
+    }
+}
+
+function checkUserPermissions() {
+    if (currentUser.role === 'admin') {
+        document.getElementById('settingsAdminOnly').style.display = 'block';
+        document.getElementById('settingsAgentMessage').classList.add('hidden');
+    } else {
+        document.getElementById('settingsAdminOnly').style.display = 'none';
+        document.getElementById('settingsAgentMessage').classList.remove('hidden');
     }
 }
 
@@ -188,6 +201,9 @@ function loadDataFromStorage() {
     
     refreshSalesTable();
     refreshDepositTable();
+    refreshCustomersTable();
+    refreshTopUpTable();
+    refreshUsersTable();
 }
 
 // ===================== DASHBOARD =====================
@@ -228,15 +244,6 @@ function initDashboardCharts() {
     }
 
     if (filteredData.length === 0) {
-        ctx1.getContext('2d').font = '16px Kantumruy Pro';
-        ctx1.getContext('2d').fillStyle = '#6c757d';
-        ctx1.getContext('2d').textAlign = 'center';
-        ctx1.getContext('2d').fillText('គ្មានទិន្នន័យ', ctx1.width / 2, ctx1.height / 2);
-        
-        ctx2.getContext('2d').font = '16px Kantumruy Pro';
-        ctx2.getContext('2d').fillStyle = '#6c757d';
-        ctx2.getContext('2d').textAlign = 'center';
-        ctx2.getContext('2d').fillText('គ្មានទិន្នន័យ', ctx2.width / 2, ctx2.height / 2);
         return;
     }
 
@@ -502,7 +509,7 @@ document.getElementById('salesForm').addEventListener('submit', function(e) {
     if (editingSalesIndex !== null) {
         salesData[editingSalesIndex] = formData;
         editingSalesIndex = null;
-        showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានកែប្រែដោយជោគជ័យ!');
+        showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានកែប��រែដោយជោគជ័យ!');
     } else {
         salesData.push(formData);
         showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានរក្សាទុកដោយជោគជ័យ!');
@@ -757,10 +764,6 @@ function initReportsChart() {
     }
 
     if (filteredData.length === 0) {
-        ctx.getContext('2d').font = '16px Kantumruy Pro';
-        ctx.getContext('2d').fillStyle = '#6c757d';
-        ctx.getContext('2d').textAlign = 'center';
-        ctx.getContext('2d').fillText('គ្មានទិន្នន័យ', ctx.width / 2, ctx.height / 2);
         return;
     }
 
@@ -827,6 +830,473 @@ function refreshReportTable() {
             <td class="total-amount">$${parseFloat(data.total_revenue).toFixed(2)}</td>
         `;
     });
+}
+
+// ===================== CUSTOMER MODAL =====================
+function openCustomerModal() {
+    document.getElementById('customerModal').style.display = 'block';
+    document.getElementById('edit_customer_index').value = '';
+    document.getElementById('customerModalTitle').textContent = 'បន្ថែមអតិថិជនថ្មី';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('cust_date').value = today;
+    
+    if (currentUser.username !== 'admin') {
+        document.getElementById('cust_staff').value = currentUser.fullname;
+    } else {
+        document.getElementById('cust_staff').value = '';
+    }
+}
+
+function closeCustomerModal() {
+    document.getElementById('customerModal').style.display = 'none';
+    document.getElementById('customerForm').reset();
+}
+
+document.getElementById('customerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let staffName = document.getElementById('cust_staff').value.trim();
+    if (!staffName) staffName = currentUser.fullname;
+
+    const editIndex = document.getElementById('edit_customer_index').value;
+    
+    const formData = {
+        date: document.getElementById('cust_date').value,
+        staff: staffName,
+        branch: currentUser.branch,
+        name: document.getElementById('cust_name').value,
+        phone: document.getElementById('cust_phone').value,
+        product: document.getElementById('cust_product').value,
+        status: document.getElementById('cust_status').value,
+        remark: document.getElementById('cust_remark').value || '-'
+    };
+
+    if (editIndex !== '') {
+        customersData[editIndex] = formData;
+        showSuccessPopup('បានកែប្រែអតិថិជនដោយជោគជ័យ!');
+    } else {
+        customersData.push(formData);
+        showSuccessPopup('អតិថិជនត្រូវបានបន្ថែមដោយជោគជ័យ!');
+    }
+    
+    saveDataToStorage();
+    refreshCustomersTable();
+    closeCustomerModal();
+});
+
+function refreshCustomersTable() {
+    const tbody = document.getElementById('customersTableBody');
+    tbody.innerHTML = '';
+    
+    let filteredData = customersData;
+    if (currentUser.role !== 'admin') {
+        filteredData = customersData.filter(d => d.branch === currentUser.branch);
+    }
+
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-users" style="font-size: 48px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>មិនទាន់មានអតិថិជននៅឡើយទេ</td></tr>';
+        return;
+    }
+    
+    filteredData.forEach((data, index) => {
+        const originalIndex = customersData.indexOf(data);
+        const canEdit = canEditData(data);
+        
+        let statusClass = '';
+        switch(data.status) {
+            case 'New Lead': statusClass = 'status-new-lead'; break;
+            case 'Prospect': statusClass = 'status-prospect'; break;
+            case 'Hot Prospect': statusClass = 'status-hot-prospect'; break;
+            case 'Closed': statusClass = 'status-closed'; break;
+        }
+        
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${data.date}</td>
+            <td>${data.staff}</td>
+            <td>${data.branch}</td>
+            <td>${data.name}</td>
+            <td>${data.phone}</td>
+            <td>${data.product}</td>
+            <td><span class="status-badge ${statusClass}">${data.status}</span></td>
+            <td>${data.remark}</td>
+            <td class="actions">
+                <button class="edit-btn" onclick="editCustomerRow(${originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" onclick="deleteCustomerRow(${originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+    });
+}
+
+function editCustomerRow(index) {
+    const data = customersData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចកែប្��ែទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    document.getElementById('cust_date').value = data.date;
+    document.getElementById('cust_staff').value = data.staff;
+    document.getElementById('cust_name').value = data.name;
+    document.getElementById('cust_phone').value = data.phone;
+    document.getElementById('cust_product').value = data.product;
+    document.getElementById('cust_status').value = data.status;
+    document.getElementById('cust_remark').value = data.remark === '-' ? '' : data.remark;
+    document.getElementById('edit_customer_index').value = index;
+    document.getElementById('customerModalTitle').textContent = 'កែប្រែអតិថិជន';
+    document.getElementById('customerModal').style.display = 'block';
+}
+
+function deleteCustomerRow(index) {
+    const data = customersData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចលុបទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    if (confirm('តើអ្នកប្រាកដថាចង់លុបអតិថិជននេះមែនទេ?')) {
+        customersData.splice(index, 1);
+        saveDataToStorage();
+        refreshCustomersTable();
+        showSuccessPopup('បានលុបអតិថិជនដោយជោគជ័យ!');
+    }
+}
+
+// ===================== TOP UP MODAL =====================
+function openTopUpModal() {
+    document.getElementById('topupModal').style.display = 'block';
+    document.getElementById('edit_topup_index').value = '';
+    document.getElementById('topupModalTitle').textContent = 'បន្ថែម Top Up';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('topup_date').value = today;
+    
+    if (currentUser.username !== 'admin') {
+        document.getElementById('topup_staff').value = currentUser.fullname;
+    } else {
+        document.getElementById('topup_staff').value = '';
+    }
+}
+
+function closeTopUpModal() {
+    document.getElementById('topupModal').style.display = 'none';
+    document.getElementById('topupForm').reset();
+}
+
+document.getElementById('topupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let staffName = document.getElementById('topup_staff').value.trim();
+    if (!staffName) staffName = currentUser.fullname;
+
+    const editIndex = document.getElementById('edit_topup_index').value;
+    
+    const formData = {
+        date: document.getElementById('topup_date').value,
+        staff: staffName,
+        branch: currentUser.branch,
+        customer: document.getElementById('topup_customer').value,
+        phone: document.getElementById('topup_phone').value,
+        contact: document.getElementById('topup_contact').value || '-',
+        product: document.getElementById('topup_product').value,
+        expiry: document.getElementById('topup_expiry').value,
+        remark: document.getElementById('topup_remark').value || '-'
+    };
+
+    if (editIndex !== '') {
+        topupData[editIndex] = formData;
+        showSuccessPopup('បានកែប្រែ Top Up ដោយជោគជ័យ!');
+    } else {
+        topupData.push(formData);
+        showSuccessPopup('Top Up ត្រូវបានបន្ថែមដោយជោគជ័យ!');
+    }
+    
+    saveDataToStorage();
+    refreshTopUpTable();
+    checkExpiringCustomers();
+    closeTopUpModal();
+});
+
+function refreshTopUpTable() {
+    const tbody = document.getElementById('topupTableBody');
+    tbody.innerHTML = '';
+    
+    let filteredData = topupData;
+    if (currentUser.role !== 'admin') {
+        filteredData = topupData.filter(d => d.branch === currentUser.branch);
+    }
+
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-mobile-alt" style="font-size: 48px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>មិនទាន់មាន Top Up នៅឡើយទេ</td></tr>';
+        return;
+    }
+    
+    filteredData.forEach((data, index) => {
+        const originalIndex = topupData.indexOf(data);
+        const canEdit = canEditData(data);
+        
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${data.date}</td>
+            <td>${data.staff}</td>
+            <td>${data.branch}</td>
+            <td>${data.customer}</td>
+            <td>${data.phone}</td>
+            <td>${data.contact}</td>
+            <td>${data.product}</td>
+            <td>${data.expiry}</td>
+            <td>${data.remark}</td>
+            <td class="actions">
+                <button class="edit-btn" onclick="editTopUpRow(${originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" onclick="deleteTopUpRow(${originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+    });
+}
+
+function editTopUpRow(index) {
+    const data = topupData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចកែប្រែទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    document.getElementById('topup_date').value = data.date;
+    document.getElementById('topup_staff').value = data.staff;
+    document.getElementById('topup_customer').value = data.customer;
+    document.getElementById('topup_phone').value = data.phone;
+    document.getElementById('topup_contact').value = data.contact === '-' ? '' : data.contact;
+    document.getElementById('topup_product').value = data.product;
+    document.getElementById('topup_expiry').value = data.expiry;
+    document.getElementById('topup_remark').value = data.remark === '-' ? '' : data.remark;
+    document.getElementById('edit_topup_index').value = index;
+    document.getElementById('topupModalTitle').textContent = 'កែប្រែ Top Up';
+    document.getElementById('topupModal').style.display = 'block';
+}
+
+function deleteTopUpRow(index) {
+    const data = topupData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចលុបទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    if (confirm('តើអ្នកប្រាកដថាចង់លុប Top Up នេះមែនទេ?')) {
+        topupData.splice(index, 1);
+        saveDataToStorage();
+        refreshTopUpTable();
+        checkExpiringCustomers();
+        showSuccessPopup('បានលុប Top Up ដោយជោគជ័យ!');
+    }
+}
+
+// ===================== EXPIRY CHECK =====================
+function checkExpiringCustomers() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const sevenDaysFromNow = new Date(today);
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    
+    let expiredCount = 0;
+    let expirySoonCount = 0;
+    let expiryRows = [];
+    
+    let filteredData = topupData;
+    if (currentUser.role !== 'admin') {
+        filteredData = topupData.filter(d => d.branch === currentUser.branch);
+    }
+    
+    filteredData.forEach((data, index) => {
+        const expiryDate = new Date(data.expiry);
+        expiryDate.setHours(0, 0, 0, 0);
+        
+        let status = '';
+        let rowClass = '';
+        
+        if (expiryDate < today) {
+            expiredCount++;
+            status = '<span class="expiry-status expiry-expired"><i class="fas fa-times-circle"></i> ផុតកំណត់</span>';
+            rowClass = 'expiry-row-danger';
+        } else if (expiryDate <= sevenDaysFromNow) {
+            expirySoonCount++;
+            const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+            status = `<span class="expiry-status expiry-soon"><i class="fas fa-exclamation-triangle"></i> ជិតផុត (${daysLeft} ថ្ងៃ)</span>`;
+            rowClass = 'expiry-row-warning';
+        }
+        
+        if (status) {
+            expiryRows.push({...data, status, rowClass, originalIndex: topupData.indexOf(data)});
+        }
+    });
+    
+    const tbody = document.getElementById('expiryTableBody');
+    tbody.innerHTML = '';
+    
+    if (expiryRows.length > 0) {
+        expiryRows.forEach(data => {
+            const canEdit = canEditData(data);
+            const row = tbody.insertRow();
+            row.className = data.rowClass;
+            row.innerHTML = `
+                <td>${data.date}</td>
+                <td>${data.staff}</td>
+                <td>${data.branch}</td>
+                <td>${data.customer}</td>
+                <td>${data.phone}</td>
+                <td>${data.contact}</td>
+                <td>${data.product}</td>
+                <td>${data.expiry}</td>
+                <td>${data.status}</td>
+                <td>${data.remark}</td>
+                <td class="actions">
+                    <button class="edit-btn" onclick="editTopUpRow(${data.originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" onclick="deleteTopUpRow(${data.originalIndex})" ${!canEdit ? 'disabled' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+        });
+    } else {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11" style="text-align: center; padding: 30px; color: #6c757d;">
+                    <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                    គ្មានអតិថិជនជិតផុតកំណត់ ឬ ផុតកំណត់ទេ
+                </td>
+            </tr>
+        `;
+    }
+    
+    if (expiredCount > 0) {
+        document.getElementById('expiredCount').textContent = expiredCount;
+        document.getElementById('expiryDangerWarning').classList.remove('hidden');
+    } else {
+        document.getElementById('expiryDangerWarning').classList.add('hidden');
+    }
+    
+    if (expirySoonCount > 0) {
+        document.getElementById('expirySoonCount').textContent = expirySoonCount;
+        document.getElementById('expiryWarning').classList.remove('hidden');
+    } else {
+        document.getElementById('expiryWarning').classList.add('hidden');
+    }
+}
+
+// ===================== USER MODAL =====================
+function openUserModal() {
+    document.getElementById('userModal').style.display = 'block';
+    document.getElementById('edit_user_index').value = '';
+    document.getElementById('user_password').required = true;
+    document.getElementById('user_password').placeholder = '';
+    document.getElementById('userModalTitle').textContent = 'បន្ថែមអ្នកប្រើប្រាស់ថ្មី';
+}
+
+function closeUserModal() {
+    document.getElementById('userModal').style.display = 'none';
+    document.getElementById('userForm').reset();
+}
+
+document.getElementById('userForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const editIndex = document.getElementById('edit_user_index').value;
+    
+    const formData = {
+        username: document.getElementById('user_username').value,
+        password: document.getElementById('user_password').value,
+        fullname: document.getElementById('user_fullname').value,
+        role: document.getElementById('user_role').value,
+        branch: document.getElementById('user_branch').value,
+        status: document.getElementById('user_status').value,
+        createdDate: editIndex !== '' ? usersData[editIndex].createdDate : new Date().toISOString().split('T')[0]
+    };
+
+    if (editIndex !== '') {
+        if (!formData.password) {
+            formData.password = usersData[editIndex].password;
+        }
+        usersData[editIndex] = formData;
+        showSuccessPopup('បានកែប្រែអ្នកប្រើប្រាស់ដោយជោគជ័យ!');
+    } else {
+        if (usersData.some(u => u.username === formData.username)) {
+            showSuccessPopup('Username នេះមានរួចហើយ! សូមប្រើ Username ផ្សេង។');
+            return;
+        }
+        usersData.push(formData);
+        showSuccessPopup('អ្នកប្រើប្រាស់ត្រូវបានបន្ថែមដោយជោគជ័យ!');
+    }
+    
+    saveDataToStorage();
+    refreshUsersTable();
+    closeUserModal();
+});
+
+function refreshUsersTable() {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+
+    if (usersData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-users" style="font-size: 48px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>មិនទាន់មានអ្នកប្រើប្រាស់នៅឡើយទេ</td></tr>';
+        return;
+    }
+    
+    usersData.forEach((data, index) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${data.username}</td>
+            <td>${data.fullname}</td>
+            <td><span class="status-badge status-${data.role}">${data.role.toUpperCase()}</span></td>
+            <td>${data.branch}</td>
+            <td><span class="status-badge status-${data.status}">${data.status.toUpperCase()}</span></td>
+            <td>${data.createdDate}</td>
+            <td class="actions">
+                <button class="edit-btn" onclick="editUserRow(${index})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" onclick="deleteUserRow(${index})" ${data.username === 'admin' && data.role === 'admin' ? 'disabled' : ''}>
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+    });
+}
+
+function editUserRow(index) {
+    const data = usersData[index];
+    document.getElementById('user_username').value = data.username;
+    document.getElementById('user_fullname').value = data.fullname;
+    document.getElementById('user_role').value = data.role;
+    document.getElementById('user_branch').value = data.branch;
+    document.getElementById('user_status').value = data.status;
+    document.getElementById('user_password').value = '';
+    document.getElementById('user_password').required = false;
+    document.getElementById('user_password').placeholder = 'Leave empty to keep current password';
+    document.getElementById('edit_user_index').value = index;
+    document.getElementById('userModalTitle').textContent = 'កែប្រែអ្នកប្រើប្រាស់';
+    document.getElementById('userModal').style.display = 'block';
+}
+
+function deleteUserRow(index) {
+    const user = usersData[index];
+    if (user.username === 'admin' && user.role === 'admin') {
+        showSuccessPopup('មិនអាចលុប Admin account មេបានទេ!');
+        return;
+    }
+    if (confirm(`តើអ្នកប្រាកដថាចង់លុបអ្នកប្រើប្រាស់ "${user.fullname}" មែនទេ?`)) {
+        usersData.splice(index, 1);
+        saveDataToStorage();
+        refreshUsersTable();
+        showSuccessPopup('បានលុបអ្នកប្រើប្រាស់ដោយជោគជ័យ!');
+    }
 }
 
 // ===================== MODAL CLICK OUTSIDE =====================
