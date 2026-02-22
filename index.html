@@ -3,139 +3,2457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>ប្រព័ន្ធគ្រប់គ្រងការលក់</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Smart Shop Tram Kak - Final Version</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Kantumruy:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #219E42; --bg: #f1f5f9; }
-        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 950px; border-top: 5px solid var(--primary); }
-        .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .group-label { grid-column: 1 / -1; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; margin: 15px 0 10px 0; background: #f8fafc; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
-        input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; font-size: 1rem; margin-top: 10px; }
-        .table-wrap { width: 100%; max-width: 950px; margin-top: 30px; background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        #loader { display: none; text-align: center; color: var(--primary); font-weight: 700; margin-top: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kantumruy Pro', 'Kantumruy', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e7e34 0%, #155724 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background-color: rgba(0,0,0,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        .sidebar-header .user-info {
+            margin-top: 10px;
+            font-size: 13px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: 'Kantumruy Pro', sans-serif;
+            cursor: pointer;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background-color: rgba(255,255,255,0.15);
+            border-left: 4px solid white;
+        }
+
+        .sidebar-menu li a i {
+            font-size: 18px;
+            margin-right: 15px;
+            width: 25px;
+        }
+
+        .sidebar-menu li a span {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Logout Section - Fixed at Bottom */
+        .sidebar-footer {
+            padding: 0;
+            background-color: rgba(0,0,0,0.15);
+            border-top: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-footer .logout-link {
+            display: flex;
+            align-items: center;
+            padding: 20px 20px;
+            color: #ffcccb;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-family: 'Kantumruy Pro', sans-serif;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .sidebar-footer .logout-link:hover {
+            background-color: rgba(220, 53, 69, 0.25);
+            color: #fff;
+        }
+
+        .sidebar-footer .logout-link i {
+            font-size: 20px;
+            margin-right: 15px;
+            width: 25px;
+            color: #ff6b6b;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            width: calc(100% - 280px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 30px;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-header i {
+            font-size: 22px;
+            color: #28a745;
+            margin-right: 10px;
+        }
+
+        .form-header .icon-plus {
+            width: 26px;
+            height: 26px;
+            margin-right: 10px;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(119%);
+        }
+
+        .form-header h2 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+            font-family: 'Kantumruy Pro', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        /* Info Message Box */
+        .info-message {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196F3;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+        }
+
+        .info-message i {
+            color: #2196F3;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .info-message p {
+            color: #1565C0;
+            font-size: 13px;
+            font-weight: 500;
+            margin: 0;
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        /* Warning Message Box */
+        .warning-message {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border-left: 4px solid #ffc107;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+        }
+
+        .warning-message i {
+            color: #f57c00;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .warning-message p {
+            color: #856404;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        /* Danger Message Box */
+        .danger-message {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 4px solid #dc3545;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .danger-message i {
+            color: #dc3545;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .danger-message p {
+            color: #721c24;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        /* Form Styles */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-row-with-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label i {
+            margin-right: 6px;
+            color: #28a745;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Kantumruy', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: #c0c0c0;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+            font-family: 'Kantumruy', sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.12);
+            background-color: #f8fff9;
+        }
+
+        .form-group.highlight input {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+            font-weight: 600;
+            color: #155724;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .form-group.highlight input:focus {
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+        }
+
+        /* Number Input Styling */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Date Input Styling */
+        input[type="date"] {
+            cursor: pointer;
+            padding-right: 35px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2328a745' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .section-title {
+            margin: 20px 0 12px 0;
+            padding: 8px 10px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+        }
+
+        .section-title h3 {
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 600;
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.3px;
+        }
+
+        .section-title h3 i {
+            margin-right: 7px;
+            font-size: 14px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            padding: 9px 16px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(40, 167, 69, 0.25);
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: 100%;
+        }
+
+        .submit-btn i {
+            font-size: 14px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(40, 167, 69, 0.35);
+            background: linear-gradient(135deg, #218838 0%, #1ba87d 100%);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Clear Button */
+        .clear-btn {
+            padding: 9px 16px;
+            background: white;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: 100%;
+        }
+
+        .clear-btn i {
+            font-size: 14px;
+        }
+
+        .clear-btn:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 12px rgba(220, 53, 69, 0.25);
+        }
+
+        .clear-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Add Customer Button */
+        .add-customer-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(40, 167, 69, 0.25);
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-customer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(40, 167, 69, 0.35);
+            background: linear-gradient(135deg, #218838 0%, #1ba87d 100%);
+        }
+
+        /* Top Up Button */
+        .topup-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(0, 123, 255, 0.25);
+            font-family: 'Kantumruy Pro', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(0, 123, 255, 0.35);
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header.topup-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new-lead {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-prospect {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-hot-prospect {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .status-closed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        /* Expiry Status Badge */
+        .expiry-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .expiry-expired {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .expiry-soon {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .expiry-ok {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 30px;
+        }
+
+        .table-card.expiry-card {
+            border-left: 4px solid #dc3545;
+        }
+
+        .table-header {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-header i {
+            color: #28a745;
+            font-size: 20px;
+        }
+
+        .table-header.expiry-header i {
+            color: #dc3545;
+        }
+
+        .table-header h2 {
+            font-size: 17px;
+            color: #333;
+            font-weight: 600;
+            font-family: 'Kantumruy Pro', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reset-btn, .export-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Kantumruy Pro', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reset-btn {
+            background-color: white;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        .reset-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Table Styles */
+        .data-table {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #212529;
+            font-family: 'Kantumruy', sans-serif;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr.expiry-row-warning {
+            background-color: #fff8e1;
+        }
+
+        tbody tr.expiry-row-danger {
+            background-color: #ffebee;
+        }
+
+        .amount {
+            color: #0066cc;
+            font-weight: 500;
+        }
+
+        .total-amount {
+            color: #28a745;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .cash-amount {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .credit-amount {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .note-info {
+            color: #17a2b8;
+            font-size: 13px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kantumruy Pro', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+            color: #000;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #e09f00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Reports Page Styles */
+        .report-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            border-left: 4px solid #28a745;
+        }
+
+        .report-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-title h1 {
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .report-subtitle {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .report-summary {
+            text-align: right;
+        }
+
+        .total-sale {
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .service-count {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 4px solid #28a745;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .form-row-3, .form-row-4, .form-row-with-buttons, .filter-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-menu li a span {
+                display: none;
+            }
+
+            .sidebar-header h2 {
+                font-size: 14px;
+            }
+
+            .sidebar-header .user-info {
+                display: none;
+            }
+
+            .sidebar-footer .logout-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+                padding: 15px;
+            }
+
+            .form-row,
+            .form-row-3,
+            .form-row-4,
+            .form-row-with-buttons,
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-card, .table-card, .chart-card {
+                padding: 20px;
+            }
+
+            .form-header h2 {
+                font-size: 16px;
+            }
+
+            .table-header h2 {
+                font-size: 15px;
+            }
+
+            .report-header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .report-summary {
+                text-align: left;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .add-customer-btn, .topup-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>ម៉ឺនុយ</h2>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="loggedInUser">Admin</span>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li id="menu-daily-sales" class="active">
+                <a href="#" onclick="showPage('daily-sales'); return false;">
+                    <i class="fas fa-cash-register"></i>
+                    <span>ការលក់ប្រចាំថ្ងៃ</span>
+                </a>
+            </li>
+            <li id="menu-deposit">
+                <a href="#" onclick="showPage('deposit'); return false;">
+                    <i class="fas fa-coins"></i>
+                    <span>ការដាក់ប្រាក់</span>
+                </a>
+            </li>
+            <li id="menu-reports">
+                <a href="#" onclick="showPage('reports'); return false;">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>របាយការណ៍</span>
+                </a>
+            </li>
+            <li id="menu-customers">
+                <a href="#" onclick="showPage('customers'); return false;">
+                    <i class="fas fa-users"></i>
+                    <span>អតិថិជន</span>
+                </a>
+            </li>
+            <li>
+                <a href="#settings">
+                    <i class="fas fa-cog"></i>
+                    <span>ការកំណត់</span>
+                </a>
+            </li>
+        </ul>
 
-<div class="card">
-    <h2 style="margin:0 0 20px 0; color:#1e293b;"><i class="fa-solid fa-cash-register"></i> បញ្ចូលទិន្នន័យការលក់</h2>
-    <div class="input-row">
-        <div class="field"><label>ថ្ងៃខែ</label><input type="date" id="date"></div>
-        <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input type="text" id="agent"></div>
+        <!-- Logout Footer -->
+        <div class="sidebar-footer">
+            <a href="#" class="logout-link" onclick="logout(); return false;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>ចាកចេញ</span>
+            </a>
+        </div>
     </div>
-    <div class="group-label">Unit Group (ចំនួនលក់)</div>
-    <div class="input-row">
-        <div class="field"><label>Gross-Ads</label><input type="number" id="gross" value="0"></div>
-        <div class="field"><label>Change-SIM</label><input type="number" id="sim" value="0"></div>
-        <div class="field"><label>S@Home</label><input type="number" id="home" value="0"></div>
-        <div class="field"><label>Fiber+</label><input type="number" id="fiber" value="0"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            
+            <!-- ============= Daily Sales Page ============= -->
+            <div id="daily-sales-page">
+                <div class="form-card">
+                    <div class="form-header">
+                        <svg class="icon-plus" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M256,0C114.615,0,0,114.615,0,256s114.615,256,256,256s256-114.615,256-256S397.385,0,256,0z M256,480
+                                C132.288,480,32,379.712,32,256S132.288,32,256,32s224,100.288,224,224S379.712,480,256,480z"/>
+                            <path d="M272,128h-32c-8.832,0-16,7.168-16,16v96h-96c-8.832,0-16,7.168-16,16v32c0,8.832,7.168,16,16,16h96v96
+                                c0,8.832,7.168,16,16,16h32c8.832,0,16-7.168,16-16v-96h96c8.832,0,16-7.168,16-16v-32c0-8.832-7.168-16-16-16h-96v-96
+                                C288,135.168,280.832,128,272,128z"/>
+                        </svg>
+                        <h2>បញ្ចូលទិន្ន័យការលក់</h2>
+                    </div>
+
+                    <div class="info-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>សូមបញ្ចូលទិន្ន័យរបស់លោកអ្នកអោយបានត្រឹមត្រូវ</p>
+                    </div>
+
+                    <form id="salesForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    ថ្ងៃខែ
+                                </label>
+                                <input type="date" id="date" name="date" value="2026-02-21" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i>
+                                    ឈ្មោះបុគ្គលិក
+                                </label>
+                                <input type="text" id="staff_name" name="staff_name" placeholder="បញ្ចូលឈ្មោះបុគ្គលិក...">
+                            </div>
+                        </div>
+
+                        <div class="section-title">
+                            <h3>
+                                <i class="fas fa-sort-amount-up"></i>
+                                ចំនួន
+                            </h3>
+                        </div>
+                        <div class="form-row-4">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Gross-Ads
+                                </label>
+                                <input type="number" id="gross_ads" name="gross_ads" value="0" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-sim-card"></i>
+                                    Change-SIM
+                                </label>
+                                <input type="number" id="change_sim" name="change_sim" value="0" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-home"></i>
+                                    S@Home
+                                </label>
+                                <input type="number" id="s_at_home" name="s_at_home" value="0" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-wifi"></i>
+                                    Fiber+
+                                </label>
+                                <input type="number" id="fiber_plus" name="fiber_plus" value="0" min="0" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="section-title">
+                            <h3>
+                                <i class="fas fa-dollar-sign"></i>
+                                ទឹកប្រាក់ $
+                            </h3>
+                        </div>
+                        <div class="form-row-4">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    Recharge
+                                </label>
+                                <input type="number" id="recharge" name="recharge" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-shopping-cart"></i>
+                                    SC-Shop
+                                </label>
+                                <input type="number" id="sc_shop" name="sc_shop" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-store"></i>
+                                    SC-Dealer
+                                </label>
+                                <input type="number" id="sc_dealer" name="sc_dealer" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group highlight">
+                                <label>
+                                    <i class="fas fa-chart-line"></i>
+                                    Total Revenue
+                                </label>
+                                <input type="number" id="total_revenue" name="total_revenue" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-row-with-buttons">
+                            <div></div>
+                            <div></div>
+                            <div class="form-group">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-save"></i>
+                                    រក្សាទុក
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="clear-btn" onclick="clearSalesForm()">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="data-table">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="table-header-left">
+                                    <i class="fas fa-history"></i>
+                                    <h2>ប្រវត្តិការលក់</h2>
+                                </div>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ថ្ងៃខែ</th>
+                                        <th>ឈ្មោះបុគ្គលិក</th>
+                                        <th>A / S / H / F</th>
+                                        <th>R / S / D ($)</th>
+                                        <th>សរុប ($)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <tr>
+                                        <td>2026-02-19</td>
+                                        <td>Rim Saray</td>
+                                        <td>0/0/0/0</td>
+                                        <td class="amount">$0.00 / $0.00 / $0.00</td>
+                                        <td class="total-amount">$0.00</td>
+                                        <td class="actions">
+                                            <button class="edit-btn" onclick="editSalesRow(this)" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="delete-btn" onclick="deleteSalesRow(this)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= Money Deposit Page ============= -->
+            <div id="deposit-page" class="hidden">
+                <div class="form-card">
+                    <div class="form-header">
+                        <svg class="icon-plus" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M256,0C114.615,0,0,114.615,0,256s114.615,256,256,256s256-114.615,256-256S397.385,0,256,0z M256,480
+                                C132.288,480,32,379.712,32,256S132.288,32,256,32s224,100.288,224,224S379.712,480,256,480z"/>
+                            <path d="M272,128h-32c-8.832,0-16,7.168-16,16v96h-96c-8.832,0-16,7.168-16,16v32c0,8.832,7.168,16,16,16h96v96
+                                c0,8.832,7.168,16,16,16h32c8.832,0,16-7.168,16-16v-96h96c8.832,0,16-7.168,16-16v-32c0-8.832-7.168-16-16-16h-96v-96
+                                C288,135.168,280.832,128,272,128z"/>
+                        </svg>
+                        <h2>បញ្ជូលការដាក់ប្រាក់</h2>
+                    </div>
+
+                    <div class="info-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>សូមបញ្ចូលទិន្ន័យរបស់លោកអ្នកអោយបានត្រឹមត្រូវ</p>
+                    </div>
+
+                    <form id="depositForm">
+                        <div class="form-row-4">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    ថ្ងៃខែ
+                                </label>
+                                <input type="date" id="deposit_date" name="deposit_date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-user"></i>
+                                    ឈ្មោះបុគ្គលិក
+                                </label>
+                                <input type="text" id="customer_name" name="customer_name" placeholder="បញ្ចូលឈ្មោះបុគ្គលិក...">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-money-bill"></i>
+                                    Cash ($)
+                                </label>
+                                <input type="number" id="cash" name="cash" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-credit-card"></i>
+                                    Credit ($)
+                                </label>
+                                <input type="number" id="credit" name="credit" value="0.00" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group form-group-full">
+                                <label>
+                                    <i class="fas fa-sticky-note"></i>
+                                    កំណត់ចំណាំ
+                                </label>
+                                <textarea id="note" name="note" placeholder="សំគាល់បន្ថែម..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-save"></i>
+                                    រក្សាទុក
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="clear-btn" onclick="clearDepositForm()">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <i class="fas fa-history"></i>
+                            <h2>ប្រវត្តិការដាក់ប្រាក់</h2>
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ថ្ងៃខែ</th>
+                                    <th>ឈ្មោះបុគ្គលិក</th>
+                                    <th>Cash</th>
+                                    <th>Credit</th>
+                                    <th>ចំណាំ</th>
+                                    <th>សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="depositTableBody">
+                                <tr>
+                                    <td>2026-02-17</td>
+                                    <td>RIM Saray</td>
+                                    <td class="cash-amount">$32</td>
+                                    <td class="credit-amount">$12</td>
+                                    <td>-</td>
+                                    <td class="actions">
+                                        <button class="edit-btn" onclick="editDepositRow(this)" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="delete-btn" onclick="deleteDepositRow(this)" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= Reports Page ============= -->
+            <div id="reports-page" class="hidden">
+                <div class="report-header">
+                    <div class="report-header-content">
+                        <div class="report-title">
+                            <h1>Sale Visualization</h1>
+                            <p class="report-subtitle">Revenue generated based on each service</p>
+                        </div>
+                        <div class="report-summary">
+                            <div class="total-sale">USD 23.50</div>
+                            <div class="service-count">Total Sale</div>
+                            <div style="margin-top: 15px;">
+                                <strong style="font-size: 20px;">4</strong>
+                                <div class="service-count">Services</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h2>Sale</h2>
+                        </div>
+                        <div class="table-actions">
+                            <button class="reset-btn" onclick="resetFilters()">
+                                Reset
+                            </button>
+                            <button class="export-btn" onclick="exportData()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="form-group">
+                            <input type="text" placeholder="Queue" id="filter_queue">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Phone Number" id="filter_phone">
+                        </div>
+                        <div class="form-group">
+                            <select id="filter_service">
+                                <option value="">Service</option>
+                                <option value="eTop up">eTop up</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Cash">Cash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select id="filter_category">
+                                <option value="">Category</option>
+                                <option value="Recharge">Recharge</option>
+                                <option value="Payment">Payment</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="form-group">
+                            <select id="filter_simtype">
+                                <option value="">SIM Type</option>
+                                <option value="Prepaid">Prepaid</option>
+                                <option value="Postpaid">Postpaid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Top Up" id="filter_topup">
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Queue</th>
+                                    <th>Service</th>
+                                    <th>Category</th>
+                                    <th>SIM Type</th>
+                                    <th>Phone Number</th>
+                                    <th>Unit Price</th>
+                                    <th>Top Up</th>
+                                    <th>Total</th>
+                                    <th>Payment</th>
+                                    <th>Trx. Time</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody">
+                                <tr>
+                                    <td>05</td>
+                                    <td>eTop up</td>
+                                    <td>Recharge</td>
+                                    <td>-</td>
+                                    <td>0964277756</td>
+                                    <td>1.500</td>
+                                    <td>1.50</td>
+                                    <td class="total-amount">1.500</td>
+                                    <td>ACLEDA Bank P/c 1.50</td>
+                                    <td>01:08</td>
+                                    <td>21.02.2026</td>
+                                    <td>11:21:25</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= Customers Page ============= -->
+            <div id="customers-page" class="hidden">
+                <!-- Customer Leads Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <i class="fas fa-users"></i>
+                            <h2>អតិថិជន</h2>
+                        </div>
+                        <div class="table-actions">
+                            <button class="add-customer-btn" onclick="openCustomerModal()">
+                                <i class="fas fa-user-plus"></i>
+                                បន្ថែមអតិថិជន
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ថ្ងៃខ   </th>
+                                    <th>បុគ្គលិក</th>
+                                    <th>ឈ្មោះអតិថិជន</th>
+                                    <th>លេខទូរសព្ទ</th>
+                                    <th>ផលិតផល</th>
+                                    <th>Status</th>
+                                    <th>Remark</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Up Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h2>Top Up</h2>
+                        </div>
+                        <div class="table-actions">
+                            <button class="topup-btn" onclick="openTopUpModal()">
+                                <i class="fas fa-plus-circle"></i>
+                                បន្ថែម Top Up
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ថ្ងៃខែ</th>
+                                    <th>បុគ្គលិក</th>
+                                    <th>ឈ្មោះអតិថិជន</th>
+                                    <th>លេខទូរសព្ទ</th>
+                                    <th>លេខទាក់ទង</th>
+                                    <th>ផលិតផល</th>
+                                    <th>ថ្ងៃផុតកំណត់</th>
+                                    <th>Remark</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topupTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Expiring & Expired Customers Table -->
+                <div class="table-card expiry-card">
+                    <div class="table-header expiry-header">
+                        <div class="table-header-left">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h2>អតិថិជនជិតផុតកំណត់ & ផុតកំណត់រួចហើយ</h2>
+                        </div>
+                    </div>
+
+                    <!-- Warning Messages -->
+                    <div id="expiryDangerWarning" class="danger-message hidden">
+                        <i class="fas fa-times-circle"></i>
+                        <p>មានអតិថិជន <span id="expiredCount" style="font-size: 18px; font-weight: 700;">0</span> នាក់ ផុតកំណត់រួចហើយ!</p>
+                    </div>
+
+                    <div id="expiryWarning" class="warning-message hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>មានអតិថិជន <span id="expirySoonCount" style="font-size: 18px; font-weight: 700;">0</span> នាក់ ជិតផុតកំណត់ក្នុងរយៈពេល 7 ថ្ងៃខាងមុខ!</p>
+                    </div>
+
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ថ្ងៃខែ</th>
+                                    <th>បុគ្គលិក</th>
+                                    <th>ឈ្មោះអតិថិជន</th>
+                                    <th>លេខទូរសព្ទ</th>
+                                    <th>លេខទាក់ទង</th>
+                                    <th>ផលិតផល</th>
+                                    <th>ថ្ងៃផុតកំណត់</th>
+                                    <th>ស្ថានភាព</th>
+                                    <th>Remark</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiryTableBody">
+                                <tr>
+                                    <td colspan="10" style="text-align: center; padding: 30px; color: #6c757d;">
+                                        <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                                        គ្មានអតិថិជនជិតផុតកំណត់ ឬ ផុតកំណត់ទេ
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-    <div class="group-label">Currency Group (ទឹកប្រាក់ $)</div>
-    <div class="input-row">
-        <div class="field"><label>Recharge</label><input type="number" id="recharge" value="0.00" step="0.01"></div>
-        <div class="field"><label>SC-Shop</label><input type="number" id="shop" value="0.00" step="0.01"></div>
-        <div class="field"><label>SC-Dealer</label><input type="number" id="dealer" value="0.00" step="0.01"></div>
-        <div class="field"><label style="color:var(--primary)">Total Revenue</label><input type="number" id="totalrev" value="0.00" step="0.01" style="border:2px solid var(--primary); font-weight:700"></div>
+
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-user-plus"></i>
+                    <span id="customerModalTitle">បន្ថែមអតិថិជនថ្មី</span>
+                </h3>
+                <span class="close" onclick="closeCustomerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm">
+                    <input type="hidden" id="edit_customer_index" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar-alt"></i>
+                                ថ្ងៃខែឆ្នាំ
+                            </label>
+                            <input type="date" id="cust_date" name="cust_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user-tie"></i>
+                                បុគ្គលិក
+                            </label>
+                            <input type="text" id="cust_staff" name="cust_staff" placeholder="បញ្ចូលឈ្មោះបុគ្គលិក..." required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i>
+                                ឈ្មោះអតិថិជន
+                            </label>
+                            <input type="text" id="cust_name" name="cust_name" placeholder="បញ្ចូលឈ្មោះអតិថិជន..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-phone"></i>
+                                លេខទូរសព្ទ
+                            </label>
+                            <input type="tel" id="cust_phone" name="cust_phone" placeholder="012 345 678" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-box"></i>
+                                ផលិតផល
+                            </label>
+                            <select id="cust_product" name="cust_product" required>
+                                <option value="">ជ្រើសរើសផលិតផល</option>
+                                <option value="Smart@Home">Smart@Home</option>
+                                <option value="Smart Fiber+">Smart Fiber+</option>
+                                <option value="M2M">M2M</option>
+                                <option value="Smart Laor 6">Smart Laor 6</option>
+                                <option value="Smart Laor 10">Smart Laor 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-flag"></i>
+                                Status
+                            </label>
+                            <select id="cust_status" name="cust_status" required>
+                                <option value="">ជ្រើសរើស Status</option>
+                                <option value="New Lead">New Lead</option>
+                                <option value="Prospect">Prospect</option>
+                                <option value="Hot Prospect">Hot Prospect</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group form-group-full">
+                            <label>
+                                <i class="fas fa-comment"></i>
+                                Remark
+                            </label>
+                            <textarea id="cust_remark" name="cust_remark" placeholder="បញ្ចូលកំណត់សម្គាល់..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-save"></i>
+                                រក្សាទុក
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="clear-btn" onclick="clearCustomerForm()">
+                                <i class="fas fa-eraser"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <button class="btn-save" id="btnSubmit" onclick="handleSave()">រក្សាទុកទិន្នន័យ</button>
-    <div id="loader"><i class="fa-solid fa-spinner fa-spin"></i> កំពុងដំណើរការ...</div>
-</div>
 
-<div class="table-wrap">
-    <table>
-        <thead>
-            <tr><th>ថ្ងៃខែ</th><th>ភ្នាក់ងារ</th><th>A / S / H / F</th><th>R / S / D ($)</th><th>សរុប ($)</th><th>Action</th></tr>
-        </thead>
-        <tbody id="salesBody"></tbody>
-    </table>
-</div>
+    <!-- Top Up Modal -->
+    <div id="topupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header topup-header">
+                <h3>
+                    <i class="fas fa-mobile-alt"></i>
+                    <span id="topupModalTitle">បន្ថែម Top Up</span>
+                </h3>
+                <span class="close" onclick="closeTopUpModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="topupForm">
+                    <input type="hidden" id="edit_topup_index" value="">
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar-alt"></i>
+                                ថ្ងៃខែ
+                            </label>
+                            <input type="date" id="topup_date" name="topup_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user-tie"></i>
+                                បុគ្គលិក
+                            </label>
+                            <input type="text" id="topup_staff" name="topup_staff" placeholder="បញ្ចូលឈ្មោះបុគ្គលិក..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i>
+                                ឈ្មោះអតិថិជន
+                            </label>
+                            <input type="text" id="topup_customer" name="topup_customer" placeholder="បញ្ចូលឈ្មោះអតិថិជន..." required>
+                        </div>
+                    </div>
 
-<script>
-    const API = "https://script.google.com/macros/s/AKfycbw9tLKhNeeIdJ0HNwR3441CkpVf6c6GVG0-W6EjAy12_JNGUsd0gze-oRRm8kFVD82KyA/exec";
-    let editIdx = null;
-    let store = [];
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-phone"></i>
+                                លេខទូរសព្ទ
+                            </label>
+                            <input type="tel" id="topup_phone" name="topup_phone" placeholder="012 345 678" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-phone-alt"></i>
+                                លេខទាក់ទង
+                            </label>
+                            <input type="tel" id="topup_contact" name="topup_contact" placeholder="012 345 678">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-box"></i>
+                                ផលិតផល
+                            </label>
+                            <select id="topup_product" name="topup_product" required>
+                                <option value="">ជ្រើសរើសផលិតផល</option>
+                                <option value="Smart@Home">Smart@Home</option>
+                                <option value="Smart Fiber+">Smart Fiber+</option>
+                                <option value="M2M">M2M</option>
+                                <option value="Smart Laor 6">Smart Laor 6</option>
+                                <option value="Smart Laor 10">Smart Laor 10</option>
+                            </select>
+                        </div>
+                    </div>
 
-    window.onload = () => { document.getElementById('date').valueAsDate = new Date(); loadData(); };
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar-times"></i>
+                                ថ្ងៃផុតកំណត់
+                            </label>
+                            <input type="date" id="topup_expiry" name="topup_expiry" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-comment"></i>
+                                Remark
+                            </label>
+                            <textarea id="topup_remark" name="topup_remark" placeholder="បញ្ចូលកំណត់សម្គាល់..."></textarea>
+                        </div>
+                    </div>
 
-    async function loadData() {
-        document.getElementById('loader').style.display = "block";
-        try {
-            const res = await fetch(API);
-            store = await res.json();
-            const body = document.getElementById('salesBody');
-            body.innerHTML = "";
-            store.sort((a,b) => new Date(b.Date) - new Date(a.Date)).forEach(row => {
-                body.innerHTML += `<tr>
-                    <td>${row.Date ? row.Date.split('T')[0] : ''}</td>
-                    <td><b>${row.Agent || ''}</b></td>
-                    <td>${row["Gross-Ads"] || 0}/${row["Change-SIM"] || 0}/${row["S@Home"] || 0}/${row["Fiber+"] || 0}</td>
-                    <td>$${parseFloat(row.Recharge || 0).toFixed(2)} / $${parseFloat(row["SC-Shop"] || 0).toFixed(2)} / $${parseFloat(row["SC-Dealer"] || 0).toFixed(2)}</td>
-                    <td style="color:#166534; font-weight:700;">$${parseFloat(row.TotalRev || 0).toFixed(2)}</td>
-                    <td>
-                        <i class="fa-solid fa-edit" style="color:blue; cursor:pointer; margin-right:15px" onclick="editRow(${row.rowindex})"></i>
-                        <i class="fa-solid fa-trash" style="color:red; cursor:pointer" onclick="deleteRow(${row.rowindex})"></i>
-                    </td>
-                </tr>`;
+                    <div class="form-row">
+                        <div class="form-group">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-save"></i>
+                                រក្សាទុក
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="clear-btn" onclick="clearTopUpForm()">
+                                <i class="fas fa-eraser"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data storage
+        let customersData = [];
+        let topupData = [];
+
+        // ============= Check Login Status =============
+        window.addEventListener('load', function() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const username = sessionStorage.getItem('username');
+            
+            // Display username
+            const userDisplay = document.getElementById('loggedInUser');
+            if (userDisplay && username) {
+                userDisplay.textContent = username;
+            }
+            
+            // Set current dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            document.getElementById('deposit_date').value = today;
+        });
+
+        // ============= Logout Function =============
+        function logout() {
+            if (confirm('តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?')) {
+                sessionStorage.clear();
+                localStorage.removeItem('rememberMe');
+                alert('អ្នកបានចាកចេញដោយជោគជ័យ!');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ============= Page Navigation =============
+        function showPage(page) {
+            document.getElementById('daily-sales-page').classList.add('hidden');
+            document.getElementById('deposit-page').classList.add('hidden');
+            document.getElementById('reports-page').classList.add('hidden');
+            document.getElementById('customers-page').classList.add('hidden');
+            
+            document.getElementById('menu-daily-sales').classList.remove('active');
+            document.getElementById('menu-deposit').classList.remove('active');
+            document.getElementById('menu-reports').classList.remove('active');
+            document.getElementById('menu-customers').classList.remove('active');
+            
+            if (page === 'daily-sales') {
+                document.getElementById('daily-sales-page').classList.remove('hidden');
+                document.getElementById('menu-daily-sales').classList.add('active');
+            } else if (page === 'deposit') {
+                document.getElementById('deposit-page').classList.remove('hidden');
+                document.getElementById('menu-deposit').classList.add('active');
+            } else if (page === 'reports') {
+                document.getElementById('reports-page').classList.remove('hidden');
+                document.getElementById('menu-reports').classList.add('active');
+                setTimeout(initChart, 100);
+            } else if (page === 'customers') {
+                document.getElementById('customers-page').classList.remove('hidden');
+                document.getElementById('menu-customers').classList.add('active');
+                checkExpiringCustomers();
+            }
+        }
+
+        // ============= Customer Modal Functions =============
+        function openCustomerModal() {
+            document.getElementById('customerModal').style.display = 'block';
+            document.getElementById('customerModalTitle').textContent = 'បន្ថែមអតិថិជនថ្មី';
+            document.getElementById('edit_customer_index').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('cust_date').value = today;
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').style.display = 'none';
+            clearCustomerForm();
+        }
+
+        function clearCustomerForm() {
+            document.getElementById('customerForm').reset();
+            document.getElementById('edit_customer_index').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('cust_date').value = today;
+        }
+
+        // ============= Top Up Modal Functions =============
+        function openTopUpModal() {
+            document.getElementById('topupModal').style.display = 'block';
+            document.getElementById('topupModalTitle').textContent = 'បន្ថែម Top Up';
+            document.getElementById('edit_topup_index').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('topup_date').value = today;
+        }
+
+        function closeTopUpModal() {
+            document.getElementById('topupModal').style.display = 'none';
+            clearTopUpForm();
+        }
+
+        function clearTopUpForm() {
+            document.getElementById('topupForm').reset();
+            document.getElementById('edit_topup_index').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('topup_date').value = today;
+        }
+
+        window.onclick = function(event) {
+            const customerModal = document.getElementById('customerModal');
+            const topupModal = document.getElementById('topupModal');
+            if (event.target == customerModal) {
+                closeCustomerModal();
+            }
+            if (event.target == topupModal) {
+                closeTopUpModal();
+            }
+        }
+
+        // ============= Check Expiring & Expired Customers =============
+        function checkExpiringCustomers() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const sevenDaysFromNow = new Date(today);
+            sevenDaysFromNow.setDate(today.getDate() + 7);
+            
+            let expiredCount = 0;
+            let expirySoonCount = 0;
+            let expiryRows = [];
+            
+            topupData.forEach((data, index) => {
+                const expiryDate = new Date(data.expiry);
+                expiryDate.setHours(0, 0, 0, 0);
+                
+                let status = '';
+                let rowClass = '';
+                
+                if (expiryDate < today) {
+                    expiredCount++;
+                    status = '<span class="expiry-status expiry-expired"><i class="fas fa-times-circle"></i> ផុតកំណត់</span>';
+                    rowClass = 'expiry-row-danger';
+                } else if (expiryDate <= sevenDaysFromNow) {
+                    expirySoonCount++;
+                    const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                    status = `<span class="expiry-status expiry-soon"><i class="fas fa-exclamation-triangle"></i> ជិតផុត (${daysLeft} ថ្ងៃ)</span>`;
+                    rowClass = 'expiry-row-warning';
+                }
+                
+                if (status) {
+                    expiryRows.push({
+                        ...data,
+                        status: status,
+                        rowClass: rowClass,
+                        originalIndex: index
+                    });
+                }
             });
-        } catch (e) { console.error(e); }
-        document.getElementById('loader').style.display = "none";
-    }
+            
+            // Update expiry table
+            const expiryTableBody = document.getElementById('expiryTableBody');
+            expiryTableBody.innerHTML = '';
+            
+            if (expiryRows.length > 0) {
+                expiryRows.forEach(data => {
+                    const newRow = document.createElement('tr');
+                    newRow.className = data.rowClass;
+                    newRow.innerHTML = `
+                        <td>${data.date}</td>
+                        <td>${data.staff}</td>
+                        <td>${data.customer}</td>
+                        <td>${data.phone}</td>
+                        <td>${data.contact}</td>
+                        <td>${data.product}</td>
+                        <td>${data.expiry}</td>
+                        <td>${data.status}</td>
+                        <td>${data.remark}</td>
+                        <td class="actions">
+                            <button class="edit-btn" onclick="editTopUpRow(${data.originalIndex})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn" onclick="deleteTopUpRow(${data.originalIndex})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    expiryTableBody.appendChild(newRow);
+                });
+            } else {
+                expiryTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 30px; color: #6c757d;">
+                            <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                            គ្មានអតិថិជនជិតផុតកំណត់ ឬ ផុតកំណត់ទេ
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Update warning messages
+            const dangerWarning = document.getElementById('expiryDangerWarning');
+            const warningBox = document.getElementById('expiryWarning');
+            const expiredCountSpan = document.getElementById('expiredCount');
+            const expirySoonCountSpan = document.getElementById('expirySoonCount');
+            
+            if (expiredCount > 0) {
+                expiredCountSpan.textContent = expiredCount;
+                dangerWarning.classList.remove('hidden');
+            } else {
+                dangerWarning.classList.add('hidden');
+            }
+            
+            if (expirySoonCount > 0) {
+                expirySoonCountSpan.textContent = expirySoonCount;
+                warningBox.classList.remove('hidden');
+            } else {
+                warningBox.classList.add('hidden');
+            }
+        }
 
-    async function handleSave() {
-        if (!document.getElementById('agent').value) return alert("សូមបញ្ចូលឈ្មោះភ្នាក់ងារ!");
-        document.getElementById('loader').style.display = "block";
-        const payload = {
-            action: editIdx ? "UPDATE" : "ADD", rowIndex: editIdx,
-            Date: document.getElementById('date').value, Agent: document.getElementById('agent').value,
-            GrossAds: document.getElementById('gross').value, ChangeSIM: document.getElementById('sim').value,
-            SmartHome: document.getElementById('home').value, Fiber: document.getElementById('fiber').value,
-            Recharge: document.getElementById('recharge').value, SCShop: document.getElementById('shop').value,
-            SCDealer: document.getElementById('dealer').value, TotalRev: document.getElementById('totalrev').value
-        };
-        try {
-            await fetch(API, { method: "POST", body: JSON.stringify(payload) });
-            editIdx = null; resetForm(); await loadData();
-        } catch (e) { alert("Error saving!"); }
-        document.getElementById('loader').style.display = "none";
-    }
+        // ============= Handle Customer Form Submission =============
+        document.getElementById('customerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('cust_date').value,
+                staff: document.getElementById('cust_staff').value,
+                name: document.getElementById('cust_name').value,
+                phone: document.getElementById('cust_phone').value,
+                product: document.getElementById('cust_product').value,
+                status: document.getElementById('cust_status').value,
+                remark: document.getElementById('cust_remark').value || '-'
+            };
+            
+            const editIndex = document.getElementById('edit_customer_index').value;
+            
+            if (editIndex !== '') {
+                customersData[editIndex] = formData;
+                alert('បានកែប្រែអតិថិជនដោយជោគជ័យ!');
+            } else {
+                customersData.push(formData);
+                alert('អតិថិជនត្រូវបានបន្ថែមដោយជោគជ័យ!');
+            }
+            
+            refreshCustomersTable();
+            closeCustomerModal();
+        });
 
-    function editRow(id) {
-        const row = store.find(i => i.rowindex === id);
-        editIdx = id;
-        document.getElementById('btnSubmit').innerText = "ធ្វើបច្ចុប្បន្នភាព";
-        document.getElementById('date').value = row.Date.split('T')[0];
-        document.getElementById('agent').value = row.Agent;
-        document.getElementById('gross').value = row["Gross-Ads"];
-        document.getElementById('sim').value = row["Change-SIM"];
-        document.getElementById('home').value = row["S@Home"];
-        document.getElementById('fiber').value = row["Fiber+"];
-        document.getElementById('recharge').value = row.Recharge;
-        document.getElementById('shop').value = row["SC-Shop"];
-        document.getElementById('dealer').value = row["SC-Dealer"];
-        document.getElementById('totalrev').value = row.TotalRev;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        function refreshCustomersTable() {
+            const tableBody = document.getElementById('customersTableBody');
+            tableBody.innerHTML = '';
+            
+            customersData.forEach((data, index) => {
+                let statusClass = '';
+                switch(data.status) {
+                    case 'New Lead': statusClass = 'status-new-lead'; break;
+                    case 'Prospect': statusClass = 'status-prospect'; break;
+                    case 'Hot Prospect': statusClass = 'status-hot-prospect'; break;
+                    case 'Closed': statusClass = 'status-closed'; break;
+                }
+                
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${data.date}</td>
+                    <td>${data.staff}</td>
+                    <td>${data.name}</td>
+                    <td>${data.phone}</td>
+                    <td>${data.product}</td>
+                    <td><span class="status-badge ${statusClass}">${data.status}</span></td>
+                    <td>${data.remark}</td>
+                    <td class="actions">
+                        <button class="edit-btn" onclick="editCustomerRow(${index})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" onclick="deleteCustomerRow(${index})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+            });
+        }
 
-    async function deleteRow(id) {
-        if (!confirm("តើអ្នកចង់លុបទិន្នន័យនេះមែនទេ?")) return;
-        document.getElementById('loader').style.display = "block";
-        await fetch(API, { method: "POST", body: JSON.stringify({ action: "DELETE", rowIndex: id }) });
-        await loadData();
-    }
+        function editCustomerRow(index) {
+            const data = customersData[index];
+            document.getElementById('cust_date').value = data.date;
+            document.getElementById('cust_staff').value = data.staff;
+            document.getElementById('cust_name').value = data.name;
+            document.getElementById('cust_phone').value = data.phone;
+            document.getElementById('cust_product').value = data.product;
+            document.getElementById('cust_status').value = data.status;
+            document.getElementById('cust_remark').value = data.remark === '-' ? '' : data.remark;
+            document.getElementById('edit_customer_index').value = index;
+            document.getElementById('customerModalTitle').textContent = 'កែប្រែអតិថិជន';
+            document.getElementById('customerModal').style.display = 'block';
+        }
 
-    function resetForm() {
-        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "0");
-        document.getElementById('agent').value = "";
-        document.getElementById('btnSubmit').innerText = "រក្សាទុកទិន្នន័យ";
-    }
-</script>
+        function deleteCustomerRow(index) {
+            if (confirm('តើអ្នកប្រាកដថាចង់លុបអតិថិជននេះមែនទេ?')) {
+                customersData.splice(index, 1);
+                refreshCustomersTable();
+                alert('បានលុបអតិថិជនដោយជោគជ័យ!');
+            }
+        }
+
+        // ============= Handle Top Up Form Submission =============
+        document.getElementById('topupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('topup_date').value,
+                staff: document.getElementById('topup_staff').value,
+                customer: document.getElementById('topup_customer').value,
+                phone: document.getElementById('topup_phone').value,
+                contact: document.getElementById('topup_contact').value || '-',
+                product: document.getElementById('topup_product').value,
+                expiry: document.getElementById('topup_expiry').value,
+                remark: document.getElementById('topup_remark').value || '-'
+            };
+            
+            const editIndex = document.getElementById('edit_topup_index').value;
+            
+            if (editIndex !== '') {
+                topupData[editIndex] = formData;
+                alert('បានកែប្រែ Top Up ដោយជោគជ័យ!');
+            } else {
+                topupData.push(formData);
+                alert('Top Up ត្រូវបានបន្ថែមដោយជោគជ័យ!');
+            }
+            
+            refreshTopUpTable();
+            closeTopUpModal();
+            checkExpiringCustomers();
+        });
+
+        function refreshTopUpTable() {
+            const tableBody = document.getElementById('topupTableBody');
+            tableBody.innerHTML = '';
+            
+            topupData.forEach((data, index) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${data.date}</td>
+                    <td>${data.staff}</td>
+                    <td>${data.customer}</td>
+                    <td>${data.phone}</td>
+                    <td>${data.contact}</td>
+                    <td>${data.product}</td>
+                    <td>${data.expiry}</td>
+                    <td>${data.remark}</td>
+                    <td class="actions">
+                        <button class="edit-btn" onclick="editTopUpRow(${index})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" onclick="deleteTopUpRow(${index})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+            });
+        }
+
+        function editTopUpRow(index) {
+            const data = topupData[index];
+            document.getElementById('topup_date').value = data.date;
+            document.getElementById('topup_staff').value = data.staff;
+            document.getElementById('topup_customer').value = data.customer;
+            document.getElementById('topup_phone').value = data.phone;
+            document.getElementById('topup_contact').value = data.contact === '-' ? '' : data.contact;
+            document.getElementById('topup_product').value = data.product;
+            document.getElementById('topup_expiry').value = data.expiry;
+            document.getElementById('topup_remark').value = data.remark === '-' ? '' : data.remark;
+            document.getElementById('edit_topup_index').value = index;
+            document.getElementById('topupModalTitle').textContent = 'កែប្រែ Top Up';
+            document.getElementById('topupModal').style.display = 'block';
+        }
+
+        function deleteTopUpRow(index) {
+            if (confirm('តើអ្នកប្រាកដថាចង់លុប Top Up នេះមែនទេ?')) {
+                topupData.splice(index, 1);
+                refreshTopUpTable();
+                checkExpiringCustomers();
+                alert('បានលុប Top Up ដោយជោគជ័យ!');
+            }
+        }
+
+        // ============= Daily Sales Functions =============
+        function clearSalesForm() {
+            if (confirm('តើអ្នកប្រាកដថាចង់សម្អាត Form នេះមែនទេ?')) {
+                document.getElementById('salesForm').reset();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').value = today;
+                document.getElementById('gross_ads').value = '0';
+                document.getElementById('change_sim').value = '0';
+                document.getElementById('s_at_home').value = '0';
+                document.getElementById('fiber_plus').value = '0';
+                document.getElementById('recharge').value = '0.00';
+                document.getElementById('sc_shop').value = '0.00';
+                document.getElementById('sc_dealer').value = '0.00';
+                document.getElementById('total_revenue').value = '0.00';
+            }
+        }
+
+        document.getElementById('salesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('date').value,
+                staff_name: document.getElementById('staff_name').value || 'Rim Saray',
+                gross_ads: document.getElementById('gross_ads').value,
+                change_sim: document.getElementById('change_sim').value,
+                s_at_home: document.getElementById('s_at_home').value,
+                fiber_plus: document.getElementById('fiber_plus').value,
+                recharge: document.getElementById('recharge').value,
+                sc_shop: document.getElementById('sc_shop').value,
+                sc_dealer: document.getElementById('sc_dealer').value,
+                total_revenue: document.getElementById('total_revenue').value
+            };
+            
+            addToSalesTable(formData);
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('salesForm').reset();
+            document.getElementById('date').value = today;
+            document.getElementById('gross_ads').value = '0';
+            document.getElementById('change_sim').value = '0';
+            document.getElementById('s_at_home').value = '0';
+            document.getElementById('fiber_plus').value = '0';
+            document.getElementById('recharge').value = '0.00';
+            document.getElementById('sc_shop').value = '0.00';
+            document.getElementById('sc_dealer').value = '0.00';
+            document.getElementById('total_revenue').value = '0.00';
+            
+            alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ!');
+        });
+
+        function addToSalesTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            const newRow = document.createElement('tr');
+            
+            const unitString = `${data.gross_ads}/${data.change_sim}/${data.s_at_home}/${data.fiber_plus}`;
+            const currencyString = `$${parseFloat(data.recharge).toFixed(2)} / $${parseFloat(data.sc_shop).toFixed(2)} / $${parseFloat(data.sc_dealer).toFixed(2)}`;
+            
+            newRow.innerHTML = `
+                <td>${data.date}</td>
+                <td>${data.staff_name}</td>
+                <td>${unitString}</td>
+                <td class="amount">${currencyString}</td>
+                <td class="total-amount">$${parseFloat(data.total_revenue).toFixed(2)}</td>
+                <td class="actions">
+                    <button class="edit-btn" onclick="editSalesRow(this)" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" onclick="deleteSalesRow(this)" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            
+            tableBody.insertBefore(newRow, tableBody.firstChild);
+        }
+
+        function deleteSalesRow(btn) {
+            if (confirm('តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះមែនទេ?')) {
+                const row = btn.closest('tr');
+                row.remove();
+                alert('បានលុបទិន្នន័យដោយជោគជ័យ!');
+            }
+        }
+
+        function editSalesRow(btn) {
+            alert('មុខងារកែប្រែនឹងត្រូវបានអភិវឌ្ឍបន្ថែមនាពេលខាងមុខ!');
+        }
+
+        // ============= Deposit Functions =============
+        function clearDepositForm() {
+            if (confirm('តើអ្នកប្រាកដថាចង់សម្អាត Form នេះមែនទេ?')) {
+                document.getElementById('depositForm').reset();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('deposit_date').value = today;
+                document.getElementById('cash').value = '0.00';
+                document.getElementById('credit').value = '0.00';
+            }
+        }
+
+        document.getElementById('depositForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('deposit_date').value,
+                name: document.getElementById('customer_name').value || 'RIM Saray',
+                cash: document.getElementById('cash').value,
+                credit: document.getElementById('credit').value,
+                note: document.getElementById('note').value || '-'
+            };
+            
+            addDepositToTable(formData);
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('depositForm').reset();
+            document.getElementById('deposit_date').value = today;
+            document.getElementById('cash').value = '0.00';
+            document.getElementById('credit').value = '0.00';
+            
+            alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ!');
+        });
+
+        function addDepositToTable(data) {
+            const tableBody = document.getElementById('depositTableBody');
+            const newRow = document.createElement('tr');
+            
+            const cashFormatted = `$${parseFloat(data.cash).toFixed(2)}`;
+            const creditFormatted = `$${parseFloat(data.credit).toFixed(2)}`;
+            
+            newRow.innerHTML = `
+                <td>${data.date}</td>
+                <td>${data.name}</td>
+                <td class="cash-amount">${cashFormatted}</td>
+                <td class="credit-amount">${creditFormatted}</td>
+                <td class="note-info">${data.note}</td>
+                <td class="actions">
+                    <button class="edit-btn" onclick="editDepositRow(this)" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" onclick="deleteDepositRow(this)" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            
+            tableBody.insertBefore(newRow, tableBody.firstChild);
+        }
+
+        function deleteDepositRow(btn) {
+            if (confirm('តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះមែនទេ?')) {
+                const row = btn.closest('tr');
+                row.remove();
+                alert('បានលុបទិន្នន័យដោយជោគជ័យ!');
+            }
+        }
+
+        function editDepositRow(btn) {
+            alert('មុខងារកែប្រែនឹងត្រូវបានអភិវឌ្ឍបន្ថែមនាពេលខាងមុខ!');
+        }
+
+        // ============= Chart Initialization =============
+        let salesChart = null;
+
+        function initChart() {
+            if (salesChart) {
+                salesChart.destroy();
+            }
+
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Credit Card', 'Cash'],
+                    datasets: [{
+                        label: 'Revenue (USD)',
+                        data: [16.5, 5],
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107'
+                        ],
+                        borderRadius: 8,
+                        barThickness: 80
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 13,
+                                    family: 'Kantumruy Pro'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' USD ' + context.label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20,
+                            ticks: {
+                                stepSize: 5,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============= Reports Functions =============
+        function resetFilters() {
+            document.getElementById('filter_queue').value = '';
+            document.getElementById('filter_phone').value = '';
+            document.getElementById('filter_service').value = '';
+            document.getElementById('filter_category').value = '';
+            document.getElementById('filter_simtype').value = '';
+            document.getElementById('filter_topup').value = '';
+            alert('បានកំណត់ Filter ឡើងវិញ!');
+        }
+
+        function exportData() {
+            alert('មុខងារ Export នឹងត្រូវបានអភិវឌ្ឍនាពេលខាងមុខ!');
+        }
+    </script>
 </body>
 </html>
