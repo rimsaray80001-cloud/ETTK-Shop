@@ -15,6 +15,7 @@ let editingSalesIndex = null;
 let editingDepositIndex = null;
 let dashboardChart1 = null;
 let dashboardChart2 = null;
+let currentDashboardFilter = 'today';
 
 // ===================== SUCCESS POPUP FUNCTIONS =====================
 function showSuccessPopup(message) {
@@ -206,7 +207,49 @@ function loadDataFromStorage() {
     refreshUsersTable();
 }
 
-// ===================== DASHBOARD =====================
+// ===================== DASHBOARD WITH FILTERS =====================
+function filterDashboard(period) {
+    currentDashboardFilter = period;
+    
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('filter-' + period).classList.add('active');
+    
+    initDashboard();
+}
+
+function getFilteredDataByPeriod(data) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return data.filter(d => {
+        const dataDate = new Date(d.date);
+        dataDate.setHours(0, 0, 0, 0);
+        
+        if (currentDashboardFilter === 'all') return true;
+        
+        if (currentDashboardFilter === 'today') {
+            return dataDate.getTime() === today.getTime();
+        }
+        
+        if (currentDashboardFilter === 'week') {
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+            return dataDate >= weekAgo && dataDate <= today;
+        }
+        
+        if (currentDashboardFilter === 'month') {
+            return dataDate.getMonth() === today.getMonth() && 
+                   dataDate.getFullYear() === today.getFullYear();
+        }
+        
+        if (currentDashboardFilter === 'year') {
+            return dataDate.getFullYear() === today.getFullYear();
+        }
+        
+        return true;
+    });
+}
+
 function initDashboard() {
     calculateDashboardStats();
     initDashboardCharts();
@@ -218,6 +261,8 @@ function calculateDashboardStats() {
     if (currentUser.role !== 'admin') {
         filteredData = salesData.filter(d => d.branch === currentUser.branch);
     }
+    
+    filteredData = getFilteredDataByPeriod(filteredData);
 
     const totalRevenue = filteredData.reduce((sum, d) => sum + parseFloat(d.total_revenue || 0), 0);
     const totalRecharge = filteredData.reduce((sum, d) => sum + parseFloat(d.recharge || 0), 0);
@@ -242,76 +287,31 @@ function initDashboardCharts() {
     if (currentUser.role !== 'admin') {
         filteredData = salesData.filter(d => d.branch === currentUser.branch);
     }
+    
+    filteredData = getFilteredDataByPeriod(filteredData);
 
     if (filteredData.length === 0) {
+        document.getElementById('branchLegend').innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;">គ្មានទិន្នន័យ</p>';
         return;
     }
 
     if (currentUser.role === 'admin') {
-        document.getElementById('chartTitle').textContent = 'Revenue by Branch';
-        const branchData = {};
-        filteredData.forEach(d => {
-            if (!branchData[d.branch]) {
-                branchData[d.branch] = { revenue: 0, recharge: 0, ads: 0 };
-            }
-            branchData[d.branch].revenue += parseFloat(d.total_revenue || 0);
-            branchData[d.branch].recharge += parseFloat(d.recharge || 0);
-            branchData[d.branch].ads += parseInt(d.gross_ads || 0);
-        });
-
-        const labels = Object.keys(branchData);
-        const revenueData = labels.map(l => branchData[l].revenue);
-
-        dashboardChart1 = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Revenue (USD)',
-                    data: revenueData,
-                    backgroundColor: '#28a745',
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Revenue: $' + context.parsed.y.toFixed(2);
-                            }
-                        }
-                    }
-                },
-                scales: { 
-                    y: { 
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value;
-                            }
-                        }
-                    } 
-                }
-            }
-        });
-    } else {
-        document.getElementById('chartTitle').textContent = 'Revenue by Staff (Your Branch)';
+        // CHART 1: Revenue by Staff (All Branches Combined)
+        document.getElementById('chartTitle').textContent = 'Revenue by Staff';
         const staffData = {};
         filteredData.forEach(d => {
             if (!staffData[d.staff_name]) {
-                staffData[d.staff_name] = { revenue: 0, recharge: 0, ads: 0 };
+                staffData[d.staff_name] = { revenue: 0, branch: d.branch };
             }
             staffData[d.staff_name].revenue += parseFloat(d.total_revenue || 0);
-            staffData[d.staff_name].recharge += parseFloat(d.recharge || 0);
-            staffData[d.staff_name].ads += parseInt(d.gross_ads || 0);
         });
 
         const labels = Object.keys(staffData);
         const revenueData = labels.map(l => staffData[l].revenue);
+        const colors = labels.map((l, i) => {
+            const hue = (i * 137.5) % 360;
+            return `hsl(${hue}, 70%, 60%)`;
+        });
 
         dashboardChart1 = new Chart(ctx1, {
             type: 'bar',
@@ -320,7 +320,134 @@ function initDashboardCharts() {
                 datasets: [{
                     label: 'Revenue (USD)',
                     data: revenueData,
-                    backgroundColor: '#007bff',
+                    backgroundColor: colors,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const staffName = context.label;
+                                const branch = staffData[staffName].branch;
+                                return [
+                                    'Staff: ' + staffName,
+                                    'Branch: ' + branch,
+                                    'Revenue: $' + context.parsed.y.toFixed(2)
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: { 
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+
+        // CHART 2: Revenue Breakdown by Branch (Doughnut)
+        const branchData = {};
+        filteredData.forEach(d => {
+            if (!branchData[d.branch]) {
+                branchData[d.branch] = 0;
+            }
+            branchData[d.branch] += parseFloat(d.total_revenue || 0);
+        });
+
+        const branchLabels = Object.keys(branchData);
+        const branchValues = branchLabels.map(l => branchData[l]);
+        const branchColors = branchLabels.map((l, i) => {
+            const hue = (i * 137.5) % 360;
+            return `hsl(${hue}, 70%, 60%)`;
+        });
+
+        dashboardChart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: branchLabels,
+                datasets: [{
+                    data: branchValues,
+                    backgroundColor: branchColors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Generate Legend
+        const legendHTML = branchLabels.map((branch, index) => {
+            return `
+                <div class="branch-legend-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="branch-legend-color" style="background-color: ${branchColors[index]}"></div>
+                        <span class="branch-legend-name">${branch}</span>
+                    </div>
+                    <span class="branch-legend-value">$${branchValues[index].toFixed(2)}</span>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('branchLegend').innerHTML = legendHTML;
+
+    } else {
+        // AGENT VIEW: Revenue by Staff in Branch
+        document.getElementById('chartTitle').textContent = 'Revenue by Staff (Your Branch)';
+        const staffData = {};
+        filteredData.forEach(d => {
+            if (!staffData[d.staff_name]) {
+                staffData[d.staff_name] = { revenue: 0 };
+            }
+            staffData[d.staff_name].revenue += parseFloat(d.total_revenue || 0);
+        });
+
+        const labels = Object.keys(staffData);
+        const revenueData = labels.map(l => staffData[l].revenue);
+        const colors = labels.map((l, i) => {
+            const hue = (i * 137.5) % 360;
+            return `hsl(${hue}, 70%, 60%)`;
+        });
+
+        dashboardChart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (USD)',
+                    data: revenueData,
+                    backgroundColor: colors,
                     borderRadius: 8
                 }]
             },
@@ -345,53 +472,62 @@ function initDashboardCharts() {
                                 return '$' + value;
                             }
                         }
-                    } 
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
                 }
             }
         });
-    }
 
-    const totalRecharge = filteredData.reduce((sum, d) => sum + parseFloat(d.recharge || 0), 0);
-    const totalSCShop = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_shop || 0), 0);
-    const totalSCDealer = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_dealer || 0), 0);
+        // CHART 2: Revenue Breakdown (Recharge, SC-Shop, SC-Dealer)
+        const totalRecharge = filteredData.reduce((sum, d) => sum + parseFloat(d.recharge || 0), 0);
+        const totalSCShop = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_shop || 0), 0);
+        const totalSCDealer = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_dealer || 0), 0);
 
-    dashboardChart2 = new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Recharge', 'SC-Shop', 'SC-Dealer'],
-            datasets: [{
-                data: [totalRecharge, totalSCShop, totalSCDealer],
-                backgroundColor: ['#28a745', '#ffc107', '#007bff'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        font: {
-                            size: 12
+        dashboardChart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Recharge', 'SC-Shop', 'SC-Dealer'],
+                datasets: [{
+                    data: [totalRecharge, totalSCShop, totalSCDealer],
+                    backgroundColor: ['#28a745', '#ffc107', '#007bff'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
                         }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                            return label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+
+        document.getElementById('branchLegend').innerHTML = '';
+    }
 }
 
 function generateLeaderboard() {
@@ -402,6 +538,8 @@ function generateLeaderboard() {
     if (currentUser.role !== 'admin') {
         filteredData = salesData.filter(d => d.branch === currentUser.branch);
     }
+    
+    filteredData = getFilteredDataByPeriod(filteredData);
 
     let leaderboardData = [];
 
@@ -412,11 +550,12 @@ function generateLeaderboard() {
         const branchData = {};
         filteredData.forEach(d => {
             if (!branchData[d.branch]) {
-                branchData[d.branch] = { revenue: 0, recharge: 0, ads: 0 };
+                branchData[d.branch] = { revenue: 0, recharge: 0, ads: 0, homeInternet: 0 };
             }
             branchData[d.branch].revenue += parseFloat(d.total_revenue || 0);
             branchData[d.branch].recharge += parseFloat(d.recharge || 0);
             branchData[d.branch].ads += parseInt(d.gross_ads || 0);
+            branchData[d.branch].homeInternet += parseInt(d.s_at_home || 0) + parseInt(d.fiber_plus || 0);
         });
 
         leaderboardData = Object.keys(branchData).map(branch => ({
@@ -424,7 +563,7 @@ function generateLeaderboard() {
             revenue: branchData[branch].revenue,
             recharge: branchData[branch].recharge,
             ads: branchData[branch].ads,
-            score: branchData[branch].revenue + branchData[branch].recharge + branchData[branch].ads
+            homeInternet: branchData[branch].homeInternet
         }));
     } else {
         document.getElementById('leaderboardTitle').textContent = 'Top Staff (Your Branch)';
@@ -433,11 +572,12 @@ function generateLeaderboard() {
         const staffData = {};
         filteredData.forEach(d => {
             if (!staffData[d.staff_name]) {
-                staffData[d.staff_name] = { revenue: 0, recharge: 0, ads: 0 };
+                staffData[d.staff_name] = { revenue: 0, recharge: 0, ads: 0, homeInternet: 0 };
             }
             staffData[d.staff_name].revenue += parseFloat(d.total_revenue || 0);
             staffData[d.staff_name].recharge += parseFloat(d.recharge || 0);
             staffData[d.staff_name].ads += parseInt(d.gross_ads || 0);
+            staffData[d.staff_name].homeInternet += parseInt(d.s_at_home || 0) + parseInt(d.fiber_plus || 0);
         });
 
         leaderboardData = Object.keys(staffData).map(staff => ({
@@ -445,11 +585,11 @@ function generateLeaderboard() {
             revenue: staffData[staff].revenue,
             recharge: staffData[staff].recharge,
             ads: staffData[staff].ads,
-            score: staffData[staff].revenue + staffData[staff].recharge + staffData[staff].ads
+            homeInternet: staffData[staff].homeInternet
         }));
     }
 
-    leaderboardData.sort((a, b) => b.score - a.score);
+    leaderboardData.sort((a, b) => b.revenue - a.revenue);
 
     leaderboardData.slice(0, 10).forEach((item, index) => {
         const row = tbody.insertRow();
@@ -476,7 +616,7 @@ function generateLeaderboard() {
             <td class="total-amount">$${item.revenue.toFixed(2)}</td>
             <td class="amount">$${item.recharge.toFixed(2)}</td>
             <td>${item.ads}</td>
-            <td><strong style="font-size: 16px; color: #28a745;">${item.score.toFixed(2)}</strong></td>
+            <td><strong style="font-size: 16px; color: #007bff;">${item.homeInternet} Units</strong></td>
         `;
     });
 
@@ -509,7 +649,7 @@ document.getElementById('salesForm').addEventListener('submit', function(e) {
     if (editingSalesIndex !== null) {
         salesData[editingSalesIndex] = formData;
         editingSalesIndex = null;
-        showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានកែប��រែដោយជោគជ័យ!');
+        showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានកែប្រែដោយជោគជ័យ!');
     } else {
         salesData.push(formData);
         showSuccessPopup('ទិន្នន័យការលក់ត្រូវបានរក្សាទុកដោយជោគជ័យ!');
@@ -935,7 +1075,7 @@ function refreshCustomersTable() {
 function editCustomerRow(index) {
     const data = customersData[index];
     if (!canEditData(data)) {
-        showSuccessPopup('អ្នកមិនអាចកែប្��ែទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        showSuccessPopup('អ្នកមិនអាចកែប្រែទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
         return;
     }
     
