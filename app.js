@@ -10,6 +10,7 @@ let depositData = [];
 let customersData = [];
 let topupData = [];
 let salesChart = null;
+let reportsChart = null;
 let editingSalesIndex = null;
 let editingDepositIndex = null;
 let dashboardChart1 = null;
@@ -48,11 +49,14 @@ window.addEventListener('load', function() {
         
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date').value = today;
+        document.getElementById('deposit_date').value = today;
         
         if (userData.username !== 'admin') {
             document.getElementById('staff_name').value = userData.fullname;
+            document.getElementById('deposit_staff').value = userData.fullname;
         } else {
             document.getElementById('staff_name').value = '';
+            document.getElementById('deposit_staff').value = '';
         }
         
         document.getElementById('branch_name').value = userData.branch;
@@ -89,11 +93,14 @@ document.getElementById('loginFormPopup').addEventListener('submit', function(e)
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
+            document.getElementById('deposit_date').value = today;
             
             if (user.username !== 'admin') {
                 document.getElementById('staff_name').value = user.fullname;
+                document.getElementById('deposit_staff').value = user.fullname;
             } else {
                 document.getElementById('staff_name').value = '';
+                document.getElementById('deposit_staff').value = '';
             }
             
             document.getElementById('branch_name').value = user.branch;
@@ -142,6 +149,17 @@ function showPage(page) {
     } else if (page === 'deposit') {
         document.getElementById('deposit-page').classList.remove('hidden');
         document.getElementById('menu-deposit').classList.add('active');
+    } else if (page === 'reports') {
+        document.getElementById('reports-page').classList.remove('hidden');
+        document.getElementById('menu-reports').classList.add('active');
+        setTimeout(initReportsChart, 100);
+        refreshReportTable();
+    } else if (page === 'customers') {
+        document.getElementById('customers-page').classList.remove('hidden');
+        document.getElementById('menu-customers').classList.add('active');
+    } else if (page === 'settings') {
+        document.getElementById('settings-page').classList.remove('hidden');
+        document.getElementById('menu-settings').classList.add('active');
     }
 }
 
@@ -169,6 +187,7 @@ function loadDataFromStorage() {
     if (saved.topup) topupData = JSON.parse(saved.topup);
     
     refreshSalesTable();
+    refreshDepositTable();
 }
 
 // ===================== DASHBOARD =====================
@@ -209,7 +228,6 @@ function initDashboardCharts() {
     }
 
     if (filteredData.length === 0) {
-        // Show empty state
         ctx1.getContext('2d').font = '16px Kantumruy Pro';
         ctx1.getContext('2d').fillStyle = '#6c757d';
         ctx1.getContext('2d').textAlign = 'center';
@@ -223,7 +241,6 @@ function initDashboardCharts() {
     }
 
     if (currentUser.role === 'admin') {
-        // Admin: Show by Branch
         document.getElementById('chartTitle').textContent = 'Revenue by Branch';
         const branchData = {};
         filteredData.forEach(d => {
@@ -275,7 +292,6 @@ function initDashboardCharts() {
             }
         });
     } else {
-        // Agent: Show by Staff in Branch
         document.getElementById('chartTitle').textContent = 'Revenue by Staff (Your Branch)';
         const staffData = {};
         filteredData.forEach(d => {
@@ -328,7 +344,6 @@ function initDashboardCharts() {
         });
     }
 
-    // Chart 2: Revenue Breakdown (Doughnut Chart)
     const totalRecharge = filteredData.reduce((sum, d) => sum + parseFloat(d.recharge || 0), 0);
     const totalSCShop = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_shop || 0), 0);
     const totalSCDealer = filteredData.reduce((sum, d) => sum + parseFloat(d.sc_dealer || 0), 0);
@@ -362,7 +377,7 @@ function initDashboardCharts() {
                             const label = context.label || '';
                             const value = context.parsed || 0;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                             return label + ': $' + value.toFixed(2) + ' (' + percentage + '%)';
                         }
                     }
@@ -384,7 +399,6 @@ function generateLeaderboard() {
     let leaderboardData = [];
 
     if (currentUser.role === 'admin') {
-        // Admin: Show by Branch
         document.getElementById('leaderboardTitle').textContent = 'Top Branches';
         document.getElementById('leaderboardEntityHeader').textContent = 'Branch';
 
@@ -406,7 +420,6 @@ function generateLeaderboard() {
             score: branchData[branch].revenue + branchData[branch].recharge + branchData[branch].ads
         }));
     } else {
-        // Agent: Show by Staff
         document.getElementById('leaderboardTitle').textContent = 'Top Staff (Your Branch)';
         document.getElementById('leaderboardEntityHeader').textContent = 'Staff';
 
@@ -429,10 +442,8 @@ function generateLeaderboard() {
         }));
     }
 
-    // Sort by score
     leaderboardData.sort((a, b) => b.score - a.score);
 
-    // Display top 10
     leaderboardData.slice(0, 10).forEach((item, index) => {
         const row = tbody.insertRow();
         let rankClass = '';
@@ -584,9 +595,7 @@ function editSalesRow(index) {
     document.getElementById('sc_dealer').value = parseFloat(data.sc_dealer).toFixed(2);
     document.getElementById('total_revenue').value = parseFloat(data.total_revenue).toFixed(2);
     
-    // Switch to sales page
     showPage('daily-sales');
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     const formCard = document.querySelector('#daily-sales-page .form-card');
@@ -609,6 +618,215 @@ function deleteSalesRow(index) {
         refreshSalesTable();
         showSuccessPopup('បានលុបទិន្នន័យដោយជោគជ័យ!');
     }
+}
+
+// ===================== DEPOSIT FORM (WITH EDIT) =====================
+document.getElementById('depositForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let staffName = document.getElementById('deposit_staff').value.trim();
+    if (!staffName) staffName = currentUser.fullname;
+    
+    const formData = {
+        date: document.getElementById('deposit_date').value,
+        staff: staffName,
+        branch: currentUser.branch,
+        cash: document.getElementById('cash').value,
+        credit: document.getElementById('credit').value,
+        note: document.getElementById('note').value || '-'
+    };
+    
+    if (editingDepositIndex !== null) {
+        depositData[editingDepositIndex] = formData;
+        editingDepositIndex = null;
+        showSuccessPopup('ទិន្នន័យការដាក់ប្រាក់ត្រូវបានកែប្រែដោយជោគជ័យ!');
+    } else {
+        depositData.push(formData);
+        showSuccessPopup('ទិន្នន័យការដាក់ប្រាក់ត្រូវបានរក្សាទុកដោយជោគជ័យ!');
+    }
+    
+    saveDataToStorage();
+    refreshDepositTable();
+    resetDepositForm();
+});
+
+function resetDepositForm() {
+    document.getElementById('depositForm').reset();
+    editingDepositIndex = null;
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('deposit_date').value = today;
+    
+    if (currentUser.username !== 'admin') {
+        document.getElementById('deposit_staff').value = currentUser.fullname;
+    }
+    document.getElementById('cash').value = '0.00';
+    document.getElementById('credit').value = '0.00';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function refreshDepositTable() {
+    const tbody = document.getElementById('depositTableBody');
+    tbody.innerHTML = '';
+    
+    let filteredData = depositData;
+    if (currentUser.role !== 'admin') {
+        filteredData = depositData.filter(d => d.branch === currentUser.branch);
+    }
+    
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-inbox" style="font-size: 48px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>មិនទាន់មានទិន្នន័យនៅឡើយទេ</td></tr>';
+        return;
+    }
+    
+    filteredData.forEach((data, index) => {
+        const originalIndex = depositData.indexOf(data);
+        const canEdit = canEditData(data);
+        
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${data.date}</td>
+            <td>${data.staff}</td>
+            <td>${data.branch}</td>
+            <td class="cash-amount">$${parseFloat(data.cash).toFixed(2)}</td>
+            <td class="credit-amount">$${parseFloat(data.credit).toFixed(2)}</td>
+            <td>${data.note}</td>
+            <td class="actions">
+                <button class="edit-btn" onclick="editDepositRow(${originalIndex})" ${!canEdit ? 'disabled' : ''} title="${canEdit ? 'Edit' : 'អ្នកមិនអាចកែប្រែទិន្នន័យនេះបានទេ'}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" onclick="deleteDepositRow(${originalIndex})" ${!canEdit ? 'disabled' : ''} title="${canEdit ? 'Delete' : 'អ្នកមិនអាចលុបទិន្នន័យនេះបានទេ'}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+    });
+}
+
+function editDepositRow(index) {
+    const data = depositData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចកែប្រែទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    editingDepositIndex = index;
+    
+    document.getElementById('deposit_date').value = data.date;
+    document.getElementById('deposit_staff').value = data.staff;
+    document.getElementById('cash').value = parseFloat(data.cash).toFixed(2);
+    document.getElementById('credit').value = parseFloat(data.credit).toFixed(2);
+    document.getElementById('note').value = data.note === '-' ? '' : data.note;
+    
+    showPage('deposit');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    const formCard = document.querySelector('#deposit-page .form-card');
+    formCard.style.borderLeft = '4px solid #ffc107';
+    setTimeout(() => {
+        formCard.style.borderLeft = '4px solid #28a745';
+    }, 2000);
+}
+
+function deleteDepositRow(index) {
+    const data = depositData[index];
+    if (!canEditData(data)) {
+        showSuccessPopup('អ្នកមិនអាចលុបទិន្នន័យរបស់បុគ្គលិកផ្សេងបានទេ!');
+        return;
+    }
+    
+    if (confirm('តើអ្នកប្រាកដថាចង់លុបទិន្នន័យនេះមែនទេ?')) {
+        depositData.splice(index, 1);
+        saveDataToStorage();
+        refreshDepositTable();
+        showSuccessPopup('បានលុបទិន្នន័យដោយជោគជ័យ!');
+    }
+}
+
+// ===================== REPORTS =====================
+function initReportsChart() {
+    if (reportsChart) reportsChart.destroy();
+    
+    const ctx = document.getElementById('reportsChart');
+    if (!ctx) return;
+
+    let filteredData = salesData;
+    if (currentUser.role !== 'admin') {
+        filteredData = salesData.filter(d => d.branch === currentUser.branch);
+    }
+
+    if (filteredData.length === 0) {
+        ctx.getContext('2d').font = '16px Kantumruy Pro';
+        ctx.getContext('2d').fillStyle = '#6c757d';
+        ctx.getContext('2d').textAlign = 'center';
+        ctx.getContext('2d').fillText('គ្មានទិន្នន័យ', ctx.width / 2, ctx.height / 2);
+        return;
+    }
+
+    reportsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Recharge', 'SC-Shop', 'SC-Dealer'],
+            datasets: [{
+                label: 'Revenue (USD)',
+                data: [
+                    filteredData.reduce((sum, d) => sum + parseFloat(d.recharge), 0),
+                    filteredData.reduce((sum, d) => sum + parseFloat(d.sc_shop), 0),
+                    filteredData.reduce((sum, d) => sum + parseFloat(d.sc_dealer), 0)
+                ],
+                backgroundColor: ['#28a745', '#ffc107', '#007bff'],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'bottom' }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function refreshReportTable() {
+    const tbody = document.getElementById('reportTableBody');
+    tbody.innerHTML = '';
+    
+    let filteredData = salesData;
+    if (currentUser.role !== 'admin') {
+        filteredData = salesData.filter(d => d.branch === currentUser.branch);
+    }
+
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px; color: #6c757d;"><i class="fas fa-chart-bar" style="font-size: 48px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>គ្មានទិន្នន័យនៅឡើយទេ</td></tr>';
+        return;
+    }
+    
+    filteredData.forEach(data => {
+        const row = tbody.insertRow();
+        const totalServices = parseInt(data.gross_ads) + parseInt(data.change_sim) + parseInt(data.s_at_home) + parseInt(data.fiber_plus);
+        const totalRevenue = parseFloat(data.recharge) + parseFloat(data.sc_shop) + parseFloat(data.sc_dealer);
+        
+        row.innerHTML = `
+            <td>${data.date}</td>
+            <td>${data.staff_name}</td>
+            <td>${data.branch}</td>
+            <td>${totalServices}</td>
+            <td class="amount">$${totalRevenue.toFixed(2)}</td>
+            <td class="total-amount">$${parseFloat(data.total_revenue).toFixed(2)}</td>
+        `;
+    });
 }
 
 // ===================== MODAL CLICK OUTSIDE =====================
