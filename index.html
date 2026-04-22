@@ -174,11 +174,6 @@
             display: none;
             margin-left: 10px;
         }
-
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -251,8 +246,6 @@
 <div class="overlay" id="modalOverlay">
     <div class="modal">
         <h2 style="margin:0">New Top Up Transaction</h2>
-        <p style="color:var(--muted); font-size:14px;">Fill all required fields to sync with Google Sheet.</p>
-        
         <div class="form-grid">
             <div class="field">
                 <label>Responsible Agent</label>
@@ -309,10 +302,10 @@
 </div>
 
 <script>
-    const API_URL = "YOUR_WEB_APP_URL_HERE"; 
+    // UPDATED API URL
+    const API_URL = "https://script.google.com/macros/s/AKfycbyicq1Ozuq5Zf3zckniUbZhJWTFZZBVhtthubiH-8JnkVyymTFfza8DQiCzuYSp6A6AUQ/exec"; 
     let MASTER_DATA = [];
 
-    // Initialization
     window.onload = () => {
         const now = new Date();
         document.getElementById('monthFilter').value = now.toISOString().slice(0, 7);
@@ -321,13 +314,26 @@
 
     async function fetchData() {
         showSync(true);
+        const tableBody = document.getElementById('tableBody');
         try {
-            // Added cache buster to prevent "no data" issue on refresh
-            const response = await fetch(`${API_URL}?nocache=${new Date().getTime()}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); 
+
+            const response = await fetch(`${API_URL}?nocache=${new Date().getTime()}`, {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
             MASTER_DATA = await response.json();
             renderDashboard();
         } catch (e) {
             console.error("Fetch Error:", e);
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--bad); padding:50px;">
+                Connection Timeout. Check Internet.<br>
+                <button onclick="fetchData()" style="margin-top:10px; background:var(--accent); border:none; padding:8px 20px; border-radius:8px; cursor:pointer; color:white;">Retry Sync</button>
+            </td></tr>`;
         } finally {
             showSync(false);
         }
@@ -344,7 +350,6 @@
             return matchesMonth && matchesSearch;
         });
 
-        // KPIs
         let totalSales = 0, activeCount = 0, alertCount = 0;
 
         const html = filtered.map(item => {
@@ -356,19 +361,18 @@
             return `
                 <tr class="${status}">
                     <td><strong>${item.agent}</strong></td>
-                    <td>${item.customer}<br><small style="color:var(--muted)">${item.contact || 'N/A'}</small></td>
+                    <td>${item.customer}<br><small style="color:var(--muted)">${item.contact || ''}</small></td>
                     <td><code>${item.topup}</code></td>
                     <td>${item.tariff}</td>
                     <td style="font-weight:700">$${item.amount.toFixed(2)}</td>
                     <td>${item.renew}</td>
                     <td>${item.expire}</td>
                     <td><span class="status-pill status-${status}">${status}</span></td>
-                </tr>
-            `;
+                </tr>`;
         }).join('');
 
-        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" style="text-align:center; padding:40px;">No matching records for this month.</td></tr>';
-        document.getElementById('statSales').textContent = `$${totalSales.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+        document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" style="text-align:center; padding:40px;">No records found.</td></tr>';
+        document.getElementById('statSales').textContent = `$${totalSales.toFixed(2)}`;
         document.getElementById('statTrx').textContent = filtered.length;
         document.getElementById('statActive').textContent = activeCount;
         document.getElementById('statAlert').textContent = alertCount;
@@ -379,21 +383,14 @@
         const today = new Date(); today.setHours(0,0,0,0);
         const expiry = new Date(expDate);
         const diff = (expiry - today) / (1000 * 60 * 60 * 24);
-
         if(diff < 0) return 'expired';
         if(diff <= days) return 'expiring';
         return 'active';
     }
 
-    // Modal & Form Logic
     const modal = document.getElementById('modalOverlay');
     document.getElementById('openModalBtn').onclick = () => modal.style.display = 'flex';
-    
-    function closeModal() {
-        modal.style.display = 'none';
-        document.querySelectorAll('.modal input').forEach(i => i.value = '');
-        document.getElementById('inPeriod').value = 1;
-    }
+    function closeModal() { modal.style.display = 'none'; }
 
     function updateExpiryDate() {
         const start = document.getElementById('inRenew').value;
@@ -404,7 +401,6 @@
             document.getElementById('inExpire').value = d.toISOString().slice(0, 10);
         }
     }
-
     document.getElementById('inRenew').onchange = updateExpiryDate;
     document.getElementById('inPeriod').oninput = updateExpiryDate;
 
@@ -421,45 +417,28 @@
             expire: document.getElementById('inExpire').value
         };
 
-        if(!payload.customer || !payload.topup || isNaN(payload.amount) || !payload.renew) {
-            alert("Please fill all required fields marked in red.");
-            return;
-        }
+        if(!payload.customer || !payload.topup || isNaN(payload.amount)) return alert("Please fill fields.");
 
-        btn.disabled = true;
-        btn.textContent = "Syncing...";
+        btn.disabled = true; btn.textContent = "Syncing...";
         showSync(true);
 
         try {
-            await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-            
-            // Wait for Google Sheet to "settle" then refresh
+            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
             setTimeout(async () => {
                 await fetchData();
                 closeModal();
-                btn.disabled = false;
-                btn.textContent = "Save & Sync";
+                btn.disabled = false; btn.textContent = "Save & Sync";
             }, 2000);
-
         } catch (e) {
-            alert("Connection error. Try again.");
+            alert("Error saving.");
             btn.disabled = false;
-            btn.textContent = "Save & Sync";
         }
     };
 
-    function showSync(show) {
-        document.getElementById('syncIndicator').style.display = show ? 'block' : 'none';
-    }
-
-    // Real-time Filters
+    function showSync(show) { document.getElementById('syncIndicator').style.display = show ? 'block' : 'none'; }
     document.getElementById('monthFilter').onchange = renderDashboard;
     document.getElementById('searchInput').oninput = renderDashboard;
     document.getElementById('daysThreshold').onchange = renderDashboard;
-
 </script>
 </body>
 </html>
