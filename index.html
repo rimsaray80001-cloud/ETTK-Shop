@@ -1,4 +1,5 @@
-<!DOCTYPE html>="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Smart Shop Top Up Dashboard</title>
@@ -10,7 +11,7 @@
   --card:#111a2e;
   --text:#e7eefc;
   --muted:#9fb0d0;
-  --accent:#4aa3ff;
+  --accent:#329437; /* Updated to your preferred green */
   --warn:#ffcc00;
   --bad:#ff5a6a;
   --border:rgba(255,255,255,.08);
@@ -20,7 +21,7 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,Segoe UI,Arial;
+  font-family: "Khmer Kuntumruy", system-ui, Segoe UI, Arial;
   background:radial-gradient(1200px 600px at 20% 0%,#14224a 0%,var(--bg) 55%);
   color:var(--text);
 }
@@ -43,11 +44,12 @@ input,select,button{
   font-size:12px;
 }
 button.primary{
-  background:linear-gradient(180deg,rgba(74,163,255,.3),rgba(74,163,255,.1));
-  border-color:rgba(74,163,255,.45);
+  background:linear-gradient(180deg,rgba(50,148,55,.3),rgba(50,148,55,.1));
+  border-color:rgba(50,148,55,.45);
   font-weight:600;
   cursor:pointer;
 }
+button:disabled{opacity:0.5; cursor:not-allowed;}
 select{
   appearance:none;
   background:
@@ -75,13 +77,14 @@ main{max-width:1400px;margin:auto;padding:0 16px 30px}
   border-radius:14px;
   padding:14px;
 }
+.table-container{overflow-x:auto;}
 table{
   width:100%;
-  min-width:1300px;
+  min-width:1000px;
   border-collapse:collapse;
   font-size:13px;
 }
-th,td{padding:8px;border-bottom:1px solid var(--border)}
+th,td{padding:12px 8px;border-bottom:1px solid var(--border);text-align:left;}
 tr.expiring{background:var(--row-warn)}
 tr.expired{background:var(--row-bad)}
 .right{text-align:right}
@@ -93,25 +96,27 @@ svg{background:rgba(0,0,0,.18);border-radius:12px}
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.7);
   justify-content:center;
   align-items:center;
+  z-index:100;
 }
 .modal{
   width:760px;
   background:var(--card);
   border-radius:16px;
-  padding:16px;
+  padding:20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 .formGrid{
   display:grid;
   grid-template-columns:repeat(12,1fr);
-  gap:10px;
+  gap:12px;
 }
 .field{grid-column:span 6;display:flex;flex-direction:column;gap:6px}
 .field.full{grid-column:span 12}
-label{font-size:11px;color:var(--muted);text-transform:uppercase}
-.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 </style>
 </head>
 
@@ -153,33 +158,34 @@ label{font-size:11px;color:var(--muted);text-transform:uppercase}
   <div class="panel">
     <h3>Top Up Trend</h3>
     <div class="chartWrap">
-      <div id="agentSummary"></div>
-      <svg id="lineChart" width="100%" height="220"></svg>
+      <div id="agentSummary" style="font-size:13px; line-height:1.6"></div>
+      <svg id="lineChart" width="100%" height="220" preserveAspectRatio="none"></svg>
     </div>
   </div>
 
   <div class="panel">
     <h3>Top Up List</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Agent</th><th>Customer</th><th>Top up</th>
-          <th>Contact</th><th>Tariff</th>
-          <th class="right">Amount</th>
-          <th>Renew</th><th>Expire</th><th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
+    <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Agent</th><th>Customer</th><th>Top up</th>
+              <th>Contact</th><th>Tariff</th>
+              <th class="right">Amount</th>
+              <th>Renew</th><th>Expire</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+    </div>
   </div>
 
 </section>
 </main>
 
-<!-- MODAL -->
 <div class="modalOverlay" id="modal">
   <div class="modal">
-    <h3>Add Top Up</h3>
+    <h3 style="margin-top:0">Add New Top Up</h3>
 
     <div class="formGrid">
       <div class="field">
@@ -191,9 +197,9 @@ label{font-size:11px;color:var(--muted);text-transform:uppercase}
         </select>
       </div>
 
-      <div class="field"><label>Customer *</label><input id="fCustomer"></div>
-      <div class="field"><label>Top up *</label><input id="fTopup"></div>
-      <div class="field"><label>Contact</label><input id="fContact"></div>
+      <div class="field"><label>Customer *</label><input id="fCustomer" placeholder="Name"></div>
+      <div class="field"><label>Top up Number *</label><input id="fTopup" placeholder="010xxxxxx"></div>
+      <div class="field"><label>Contact Contact</label><input id="fContact" placeholder="Phone"></div>
 
       <div class="field"><label>Tariff *</label>
         <select id="fTariff">
@@ -207,14 +213,14 @@ label{font-size:11px;color:var(--muted);text-transform:uppercase}
         </select>
       </div>
 
-      <div class="field"><label>Amount *</label><input id="fAmount" type="number"></div>
-      <div class="field"><label>Renew *</label><input id="fRenew" type="date"></div>
+      <div class="field"><label>Amount ($) *</label><input id="fAmount" type="number" step="0.01"></div>
+      <div class="field"><label>Renew Date *</label><input id="fRenew" type="date"></div>
       <div class="field"><label>Period (Months)</label><input id="fPeriod" type="number" value="1" min="1"></div>
-      <div class="field full"><label>Expire (Auto)</label><input id="fExpire" readonly></div>
+      <div class="field full"><label>Expire Date (Auto)</label><input id="fExpire" readonly style="background:rgba(0,0,0,0.2)"></div>
     </div>
 
     <div class="actions">
-      <button id="btnSave" class="primary" type="button">Save</button>
+      <button id="btnSave" class="primary" type="button">Save Transaction</button>
       <button id="btnCancel" type="button">Cancel</button>
     </div>
   </div>
@@ -222,62 +228,91 @@ label{font-size:11px;color:var(--muted);text-transform:uppercase}
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbzPB6qiASHPX7pfOGoEnV7pNADolPLuYpPvmEFA8dFelWWnnscoEBzE7z5FRXUvYrlP5g/exec";
-let DATA=[],showExpiringOnly=false;
-const money=n=>"$"+Number(n||0).toLocaleString();
-const iso=d=>d.toISOString().slice(0,10);
+let DATA=[], showExpiringOnly=false;
 
-(()=>{const d=new Date();monthPicker.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")})();
+const rowsEl = document.getElementById("rows");
+const money = n => "$" + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
+const iso = d => d.toISOString().slice(0, 10);
+
+// Set default month to current
+(()=>{
+    const d = new Date();
+    document.getElementById("monthPicker").value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+})();
 
 async function loadData(){
-  const res=await fetch(API_URL);
-  DATA=await res.json();
-  render();
+  try {
+    const res = await fetch(API_URL);
+    DATA = await res.json();
+    render();
+  } catch(e) {
+    console.error("Load failed", e);
+  }
 }
 
 function getStatus(exp){
-  const today=new Date();today.setHours(0,0,0,0);
-  const e=new Date(exp);
-  if(e<today) return "expired";
-  if(e<=new Date(today.getTime()+Number(expireDays.value)*86400000)) return "expiring";
+  const today = new Date(); today.setHours(0,0,0,0);
+  const e = new Date(exp);
+  if(e < today) return "expired";
+  const threshold = new Date(today.getTime() + Number(document.getElementById("expireDays").value) * 86400000);
+  if(e <= threshold) return "expiring";
   return "active";
 }
 
 function updateExpire(){
-  if(!fRenew.value) return;
-  const d=new Date(fRenew.value);
-  d.setDate(d.getDate()+Number(fPeriod.value||1)*30);
-  fExpire.value=iso(d);
+  const renewVal = document.getElementById("fRenew").value;
+  const periodVal = document.getElementById("fPeriod").value;
+  if(!renewVal) return;
+  
+  const d = new Date(renewVal);
+  // Add months instead of days for better calendar accuracy
+  d.setMonth(d.getMonth() + Number(periodVal || 1));
+  document.getElementById("fExpire").value = iso(d);
 }
-fRenew.onchange=updateExpire;
-fPeriod.oninput=updateExpire;
 
-viewExpiring.onclick=()=>{
-  showExpiringOnly=!showExpiringOnly;
-  viewExpiring.textContent=showExpiringOnly?"Back":"View";
+document.getElementById("fRenew").onchange = updateExpire;
+document.getElementById("fPeriod").oninput = updateExpire;
+
+document.getElementById("viewExpiring").onclick = function(){
+  showExpiringOnly = !showExpiringOnly;
+  this.textContent = showExpiringOnly ? "Show All" : "View Expiring";
   render();
 };
 
+document.getElementById("monthPicker").onchange = render;
+document.getElementById("search").oninput = render;
+document.getElementById("expireDays").onchange = render;
+
 function render(){
-  let rows=DATA
-    .filter(r=>r.renew.startsWith(monthPicker.value))
-    .filter(r=>!search.value||r.topup.includes(search.value));
+  const searchVal = document.getElementById("search").value;
+  const monthVal = document.getElementById("monthPicker").value;
 
-  if(showExpiringOnly) rows=rows.filter(r=>getStatus(r.expire)==="expiring");
+  let rows = DATA.filter(r => {
+      const matchMonth = r.renew.startsWith(monthVal);
+      const matchSearch = !searchVal || r.topup.includes(searchVal);
+      return matchMonth && matchSearch;
+  });
 
-  kpiSales.textContent=money(rows.reduce((s,r)=>s+r.amount,0));
-  kpiTrx.textContent=rows.length;
-  kpiActive.textContent=rows.filter(r=>getStatus(r.expire)==="active").length;
-  kpiExpired.textContent=rows.filter(r=>getStatus(r.expire)!=="active").length;
+  if(showExpiringOnly) {
+      rows = rows.filter(r => getStatus(r.expire) === "expiring");
+  }
 
-  rowsEl.innerHTML="";
-  rows.forEach(r=>{
-    const st=getStatus(r.expire);
-    rowsEl.innerHTML+=`
+  // Update KPIs
+  document.getElementById("kpiSales").textContent = money(rows.reduce((s,r) => s + r.amount, 0));
+  document.getElementById("kpiTrx").textContent = rows.length;
+  document.getElementById("kpiActive").textContent = rows.filter(r => getStatus(r.expire) === "active").length;
+  document.getElementById("kpiExpired").textContent = rows.filter(r => getStatus(r.expire) !== "active").length;
+
+  // Build Table
+  rowsEl.innerHTML = "";
+  rows.forEach(r => {
+    const st = getStatus(r.expire);
+    rowsEl.innerHTML += `
       <tr class="${st}">
         <td>${r.agent}</td><td>${r.customer}</td><td>${r.topup}</td>
-        <td>${r.contact||""}</td><td>${r.tariff}</td>
+        <td>${r.contact || ""}</td><td>${r.tariff}</td>
         <td class="right">${money(r.amount)}</td>
-        <td>${r.renew}</td><td>${r.expire}</td><td>${st}</td>
+        <td>${r.renew}</td><td>${r.expire}</td><td>${st.toUpperCase()}</td>
       </tr>`;
   });
 
@@ -285,55 +320,78 @@ function render(){
 }
 
 function renderTrend(rows){
-  agentSummary.innerHTML=Object.entries(
-    rows.reduce((a,r)=>(a[r.agent]=(a[r.agent]||0)+r.amount,a),{})
-  ).map(([a,v])=>`<div><b>${a}</b>: ${money(v)}</div>`).join("");
-  lineChart.innerHTML="";
+  const summaryEl = document.getElementById("agentSummary");
+  const chartEl = document.getElementById("lineChart");
+  
+  const agentData = rows.reduce((a,r) => (a[r.agent] = (a[r.agent] || 0) + r.amount, a), {});
+  summaryEl.innerHTML = "<strong>Agent Performance:</strong><br>" + 
+    Object.entries(agentData).map(([a,v]) => `<div>${a}: ${money(v)}</div>`).join("");
+
+  chartEl.innerHTML = "";
   if(!rows.length) return;
-  const max=Math.max(...rows.map(r=>r.amount));
-  rows.slice(0,10).forEach((r,i)=>{
-    const x=40+i*60;
-    const y=180-(r.amount/max)*140;
-    if(i){
-      const p=rows[i-1];
-      const px=40+(i-1)*60;
-      const py=180-(p.amount/max)*140;
-      lineChart.innerHTML+=`<line x1="${px}" y1="${py}" x2="${x}" y2="${y}" stroke="#4aa3ff"/>`;
-    }
-    lineChart.innerHTML+=`<circle cx="${x}" cy="${y}" r="4" fill="#4aa3ff"/>`;
+
+  // Sort rows by date for the trend line
+  const sorted = [...rows].sort((a,b) => new Date(a.renew) - new Date(b.renew)).slice(-15);
+  const max = Math.max(...sorted.map(r => r.amount), 1);
+  const width = chartEl.clientWidth || 800;
+  const step = (width - 80) / Math.max(sorted.length - 1, 1);
+
+  let points = "";
+  sorted.forEach((r, i) => {
+    const x = 40 + i * step;
+    const y = 180 - (r.amount / max) * 140;
+    points += `${x},${y} `;
+    chartEl.innerHTML += `<circle cx="${x}" cy="${y}" r="4" fill="#329437"/>`;
   });
+
+  chartEl.innerHTML = `<polyline points="${points}" fill="none" stroke="#329437" stroke-width="2"/>` + chartEl.innerHTML;
 }
 
-addTopUp.onclick=()=>modal.style.display="flex";
-btnCancel.onclick=()=>modal.style.display="none";
+document.getElementById("addTopUp").onclick = () => document.getElementById("modal").style.display = "flex";
+document.getElementById("btnCancel").onclick = () => document.getElementById("modal").style.display = "none";
 
-btnSave.onclick=async ()=>{
+document.getElementById("btnSave").onclick = async function(){
+  const btn = this;
   updateExpire();
-  if(!fAgent.value||!fCustomer.value||!fTopup.value||!fTariff.value||!fAmount.value||!fRenew.value||!fExpire.value){
-    alert("Please fill all required fields");return;
+  
+  const payload = {
+    agent: document.getElementById("fAgent").value,
+    customer: document.getElementById("fCustomer").value,
+    topup: document.getElementById("fTopup").value,
+    contact: document.getElementById("fContact").value,
+    tariff: document.getElementById("fTariff").value,
+    amount: +document.getElementById("fAmount").value,
+    renew: document.getElementById("fRenew").value,
+    expire: document.getElementById("fExpire").value
+  };
+
+  if(!payload.agent || !payload.customer || !payload.topup || !payload.tariff || !payload.amount || !payload.renew){
+    alert("Please fill all required fields (*)");
+    return;
   }
-  await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      agent:fAgent.value,
-      customer:fCustomer.value,
-      topup:fTopup.value,
-      contact:fContact.value,
-      tariff:fTariff.value,
-      amount:+fAmount.value,
-      renew:fRenew.value,
-      expire:fExpire.value
-    })
-  });
-  modal.style.display="none";
-  loadData();
+
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  try {
+    await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    document.getElementById("modal").style.display = "none";
+    // Reset form
+    ["fCustomer", "fTopup", "fContact", "fAmount", "fRenew", "fExpire"].forEach(id => document.getElementById(id).value = "");
+    await loadData();
+  } catch(e) {
+    alert("Save failed. Check console.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save Transaction";
+  }
 };
 
-const rowsEl=document.getElementById("rows");
 loadData();
 </script>
 
 </body>
 </html>
-``
