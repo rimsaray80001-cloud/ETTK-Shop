@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>="en">
 <head>
 <meta charset="UTF-8">
 <title>Smart Shop Top Up Dashboard</title>
@@ -225,7 +224,6 @@ label{font-size:11px;color:var(--muted);text-transform:uppercase}
 const API_URL="https://script.google.com/macros/s/AKfycbzPB6qiASHPX7pfOGoEnV7pNADolPLuYpPvmEFA8dFelWWnnscoEBzE7z5FRXUvYrlP5g/exec";
 let DATA=[],showExpiringOnly=false;
 const money=n=>"$"+Number(n||0).toLocaleString();
-const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const iso=d=>d.toISOString().slice(0,10);
 
 (()=>{const d=new Date();monthPicker.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")})();
@@ -240,15 +238,14 @@ function getStatus(exp){
   const today=new Date();today.setHours(0,0,0,0);
   const e=new Date(exp);
   if(e<today) return "expired";
-  if(e<=addDays(today,Number(expireDays.value))) return "expiring";
+  if(e<=new Date(today.getTime()+Number(expireDays.value)*86400000)) return "expiring";
   return "active";
 }
 
 function updateExpire(){
   if(!fRenew.value) return;
-  const months=Number(fPeriod.value||1);
   const d=new Date(fRenew.value);
-  d.setDate(d.getDate()+months*30);
+  d.setDate(d.getDate()+Number(fPeriod.value||1)*30);
   fExpire.value=iso(d);
 }
 fRenew.onchange=updateExpire;
@@ -311,6 +308,7 @@ addTopUp.onclick=()=>modal.style.display="flex";
 btnCancel.onclick=()=>modal.style.display="none";
 
 btnSave.onclick=async ()=>{
+  updateExpire();
   if(!fAgent.value||!fCustomer.value||!fTopup.value||!fTariff.value||!fAmount.value||!fRenew.value||!fExpire.value){
     alert("Please fill all required fields");return;
   }
